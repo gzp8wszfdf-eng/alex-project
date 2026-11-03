@@ -31,6 +31,20 @@ main{position:static;max-width:none;margin:0;padding:0}
 
 /* PREMIUM AIRPORT HUD */
 /* CLEAN GAME VIEW: убрать лишние плавающие карточки */
+/* Нижняя панель: деньги и управление не закрывают аэропорт */
+header{top:auto!important;bottom:calc(68px + env(safe-area-inset-bottom))!important;left:0;right:0;padding:6px 10px!important;background:linear-gradient(0deg,rgba(7,17,30,.96),rgba(7,17,30,.72))!important;border-top:1px solid #ffffff20!important;border-bottom:0!important}
+header .top{display:none!important}
+header .stats{margin:0!important;gap:6px!important}
+header .stat{padding:5px 8px!important;border-radius:9px}
+header .stat small{font-size:9px}
+header .stat b{font-size:13px}
+.scenehead{display:none!important}
+#cameraTools{top:auto!important;bottom:calc(142px + env(safe-area-inset-bottom))!important;right:9px!important}
+#musicToggle{bottom:calc(142px + env(safe-area-inset-bottom))!important;left:10px!important;right:auto!important}
+.panel{bottom:calc(132px + env(safe-area-inset-bottom))!important;max-height:48dvh}
+#closeSheet{bottom:calc(132px + 48dvh + env(safe-area-inset-bottom))!important}
+@media(min-width:700px){header{bottom:85px!important;top:auto!important}#cameraTools,#musicToggle{bottom:155px!important}.panel{bottom:85px!important}}
+
 #empireLeft,#empireRight,#empireUpgrade{display:none!important}
 
 .empireCard{position:fixed;z-index:17;color:#f5f8ff;background:linear-gradient(145deg,rgba(8,22,39,.88),rgba(15,35,57,.78));border:1px solid rgba(220,239,255,.25);border-radius:15px;box-shadow:0 10px 30px #0005;backdrop-filter:blur(13px);-webkit-backdrop-filter:blur(13px)}
