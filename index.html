@@ -302,7 +302,7 @@ for(let n=0;n<2;n++){
 }
 world.add(baggageTrain);
 function buildCar(color=0x2f82b8,type='sedan'){
- const g=new THREE.Group(),paint=M(color,.32),rubber=M(0x171d24,.95),rim=M(0xaebbc3,.28),windowMat=M(0x7eb7cb,.22),lamp=M(0xfff1c2,.2),tail=M(0xe54b43,.3);
+ const g=new THREE.Group(),wheels=[],paint=M(color,.32),rubber=M(0x171d24,.95),rim=M(0xaebbc3,.28),windowMat=M(0x7eb7cb,.22),lamp=M(0xfff1c2,.2),tail=M(0xe54b43,.3);
  const length=type==='van'?2.65:2.35,width=type==='van'?1.08:1.12;
  const lower=new THREE.Mesh(new THREE.BoxGeometry(width,.48,length),paint);lower.position.y=.48;g.add(lower);
  const hood=new THREE.Mesh(new THREE.BoxGeometry(width*.94,.22,.68),paint);hood.position.set(0,.77,length*.34);g.add(hood);
@@ -314,7 +314,7 @@ function buildCar(color=0x2f82b8,type='sedan'){
   const sideGlass=new THREE.Mesh(new THREE.BoxGeometry(.035,.27,.78),windowMat);sideGlass.position.set(side*width*.415,.98,-.12);g.add(sideGlass);
   const mirror=new THREE.Mesh(new THREE.BoxGeometry(.13,.09,.18),paint);mirror.position.set(side*.62,.88,.36);g.add(mirror);
   for(const z of [-.72,.72]){
-   const tire=new THREE.Mesh(new THREE.CylinderGeometry(.27,.27,.16,18),rubber);tire.rotation.z=Math.PI/2;tire.position.set(side*.57,.29,z);g.add(tire);
+   const tire=new THREE.Mesh(new THREE.CylinderGeometry(.27,.27,.16,18),rubber);tire.rotation.z=Math.PI/2;tire.position.set(side*.57,.29,z);g.add(tire);wheels.push(tire);
    const hub=new THREE.Mesh(new THREE.CylinderGeometry(.13,.13,.17,14),rim);hub.rotation.z=Math.PI/2;hub.position.copy(tire.position);g.add(hub);
   }
   const head=new THREE.Mesh(new THREE.BoxGeometry(.24,.13,.045),lamp);head.position.set(side*.36,.62,1.19);g.add(head);
@@ -322,7 +322,7 @@ function buildCar(color=0x2f82b8,type='sedan'){
  }
  const bumper=new THREE.Mesh(new THREE.BoxGeometry(width*1.02,.14,.12),dark);bumper.position.set(0,.35,1.2);g.add(bumper);
  const backBumper=bumper.clone();backBumper.position.z=-1.2;g.add(backBumper);
- return g;
+ g.userData.wheels=wheels;return g;
 }
 const cars=[];for(let i=0;i<Math.min(3+lv.staff,10);i++){const g=buildCar(i%3===0?0xf2f4f6:i%3===1?0x267da7:0xe2ad3c,i%4===0?'van':'sedan');g.position.set(-34+i*4,0,31+(i%2)*3);world.add(g);cars.push(g)}
 // Пассажиры рейса: отдельная группа идёт от терминала к выходу A1.
@@ -368,7 +368,7 @@ for(let x=-65;x<=65;x+=5){
 // Trees, lamps, terminal signage
 for(let i=0;i<28;i++){const g=new THREE.Group(),tr=new THREE.Mesh(new THREE.CylinderGeometry(.14,.2,1.1,7),M(0x76553b)),top=new THREE.Mesh(new THREE.SphereGeometry(.9,8,7),M(i%2?0x368458:0x4b9a62));tr.position.y=.55;top.position.y=1.55;g.add(tr,top);g.position.set(-48+(i%14)*7,0,44+Math.floor(i/14)*7);world.add(g)}
 function plane(x,z,scale=1,color=0xf2f4f5,model='jet'){
- const g=new THREE.Group(),body=M(color,.34),stripe=M(model==='cargo'?0xe5a83b:0x267da7,.32),engine=M(0x53616c,.55),glassCockpit=M(0x18394c,.18);
+ const g=new THREE.Group(),landingWheels=[],body=M(color,.34),stripe=M(model==='cargo'?0xe5a83b:0x267da7,.32),engine=M(0x53616c,.55),glassCockpit=M(0x18394c,.18);
  const len=model==='cargo'?9.2:model==='commuter'?6.3:8.1,w=model==='cargo'?12:model==='commuter'?7.8:11.2;
  const fus=new THREE.Mesh(new THREE.CylinderGeometry(model==='cargo'?.58:.43,model==='cargo'?.58:.43,len,20),body);fus.rotation.x=Math.PI/2;fus.position.y=1.25;g.add(fus);
  const nose=new THREE.Mesh(new THREE.SphereGeometry(.45,18,12),body);nose.scale.set(.94,.9,1.65);nose.position.set(0,1.25,len*.47);g.add(nose);
@@ -386,11 +386,12 @@ function plane(x,z,scale=1,color=0xf2f4f5,model='jet'){
   const nav=new THREE.Mesh(new THREE.SphereGeometry(.12,10,8),M(side<0?0xff3434:0x37ee89,.2));nav.position.set(side*w*.49,1.18,-.1);g.add(nav);
   for(let n=0;n<5;n++){const win=new THREE.Mesh(new THREE.SphereGeometry(.075,8,6),glassCockpit);win.scale.set(1,.7,.45);win.position.set(side*.0,1.36,len*.24-n*.43);g.add(win)}
   const strut=new THREE.Mesh(new THREE.CylinderGeometry(.055,.07,.62,10),dark);strut.position.set(side*1.5,.45,.45);g.add(strut);
-  const wheel=new THREE.Mesh(new THREE.CylinderGeometry(.2,.2,.13,14),dark);wheel.rotation.z=Math.PI/2;wheel.position.set(side*1.5,.16,.45);g.add(wheel);
+  const wheel=new THREE.Mesh(new THREE.CylinderGeometry(.2,.2,.13,14),dark);wheel.rotation.z=Math.PI/2;wheel.position.set(side*1.5,.16,.45);g.add(wheel);landingWheels.push(wheel);
  }
  const cockpit=new THREE.Mesh(new THREE.SphereGeometry(.3,14,10),glassCockpit);cockpit.scale.set(.8,.55,1.5);cockpit.position.set(0,1.53,len*.39);g.add(cockpit);
  const noseGear=new THREE.Mesh(new THREE.CylinderGeometry(.045,.06,.4,8),dark);noseGear.position.set(0,.38,len*.35);g.add(noseGear);
- const noseWheel=new THREE.Mesh(new THREE.CylinderGeometry(.13,.13,.11,12),dark);noseWheel.rotation.z=Math.PI/2;noseWheel.position.set(0,.13,len*.35);g.add(noseWheel);
+ const noseWheel=new THREE.Mesh(new THREE.CylinderGeometry(.13,.13,.11,12),dark);noseWheel.rotation.z=Math.PI/2;noseWheel.position.set(0,.13,len*.35);g.add(noseWheel);landingWheels.push(noseWheel);
+ g.userData.landingWheels=landingWheels;
  g.position.set(x,0,z);g.scale.setScalar(scale);world.add(g);return g
 }
 const planes=[plane(-24,-7,.78,0xf4f6fa,'commuter'),plane(12,-7,.72,lv.fleet>=2?0xd9e9f4:0xf4f6fa,'jet'),...Array.from({length:Math.min(5,lv.fleet-1)},(_,i)=>plane(-28+i*13,17,.48,i%2?0xf0d9a0:0xe8f1fa,'commuter')),...Array.from({length:Math.min(3,lv.aircraft.jet)},(_,i)=>plane(-25+i*18,23,.68,0xeaf4ff,'jet')),...Array.from({length:Math.min(3,lv.aircraft.cargo)},(_,i)=>plane(-26+i*17,29,.61,0xf0d9a0,'cargo'))];planes[1].rotation.y=Math.PI;
@@ -474,9 +475,9 @@ boardingPeople.forEach((p,i)=>{
   q.legB.rotation.x=-Math.sin(t*8+i)*.48;
  }
 });
-const daylight=(Math.sin(t*.035-1.2)+1)/2;const night=1-daylight;sun.intensity=.35+1.95*daylight;scene.background.setRGB(.035+.57*daylight,.075+.68*daylight,.15+.70*daylight);scene.fog.color.copy(scene.background);const weather=document.getElementById('weather');if(weather)weather.textContent=daylight>.62?'☀ ДЕНЬ · 22°':daylight<.28?'🌙 НОЧЬ · 14°':'🌆 ВЕЧЕР · 18°';lights.forEach(l=>{l.material.emissiveIntensity=.12+night*.9});cars.forEach((c,i)=>{const a=(t*.105+i*.42)%(Math.PI*2),rx=15.4,rz=5.1;c.position.set(-20+Math.cos(a)*rx,0,31+Math.sin(a)*rz);c.rotation.y=Math.atan2(-Math.sin(a)*rz,Math.cos(a)*rx)});people.forEach((p,i)=>{const q=p.userData,phase=(t*.42+q.phase)%1;p.position.x=-25+phase*18;p.position.z=25+Math.sin(t*.8+q.phase)*1.5;q.leg1.rotation.x=Math.sin(t*7+q.phase)*.45;q.leg2.rotation.x=-Math.sin(t*7+q.phase)*.45});
+const daylight=(Math.sin(t*.035-1.2)+1)/2;const night=1-daylight;sun.intensity=.35+1.95*daylight;scene.background.setRGB(.035+.57*daylight,.075+.68*daylight,.15+.70*daylight);scene.fog.color.copy(scene.background);const weather=document.getElementById('weather');if(weather)weather.textContent=daylight>.62?'☀ ДЕНЬ · 22°':daylight<.28?'🌙 НОЧЬ · 14°':'🌆 ВЕЧЕР · 18°';lights.forEach(l=>{l.material.emissiveIntensity=.12+night*.9});cars.forEach((c,i)=>{const a=(t*.105+i*.42)%(Math.PI*2),rx=15.4,rz=5.1;c.position.set(-20+Math.cos(a)*rx,0,31+Math.sin(a)*rz);c.rotation.y=Math.atan2(-Math.sin(a)*rz,Math.cos(a)*rx);c.userData.wheels?.forEach(w=>w.rotation.x+=.11)});people.forEach((p,i)=>{const q=p.userData,phase=(t*.42+q.phase)%1;p.position.x=-25+phase*18;p.position.z=25+Math.sin(t*.8+q.phase)*1.5;q.leg1.rotation.x=Math.sin(t*7+q.phase)*.45;q.leg2.rotation.x=-Math.sin(t*7+q.phase)*.45});
 // Чемоданы движутся по ленте выдачи багажа.
-baggageBags.forEach((bag,i)=>{const phase=(t*.42+i*.2)%1;bag.position.z=2.9+phase*5.5;bag.position.x=7+Math.sin(t*1.8+i)*.08});lights.forEach((l,i)=>{l.material.emissive=new THREE.Color(0xffdf85);l.material.emissiveIntensity=.12+night*.9});renderer.render(scene,camera);document.body.classList.add('webgl-ready')}animate();
+baggageBags.forEach((bag,i)=>{const phase=(t*.42+i*.2)%1;bag.position.z=2.9+phase*5.5;bag.position.x=7+Math.sin(t*1.8+i)*.08});lights.forEach((l,i)=>{l.material.emissive=new THREE.Color(0xffdf85);l.material.emissiveIntensity=.12+night*.9});const rolling=arrivalCycle<40||serviceCycle<55;[arrival,departing].forEach((p,i)=>{if(rolling&&p.visible)p.userData.landingWheels?.forEach(w=>w.rotation.x+=.16)});renderer.render(scene,camera);document.body.classList.add('webgl-ready')}animate();
 </script>
 
 
