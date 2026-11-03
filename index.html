@@ -496,7 +496,8 @@ for(const x of [-.62,.62])for(const z of [-.95,.95]){const w=new THREE.Mesh(new 
 world.add(flightFuel);
 const baggageTrain=new THREE.Group();baggageTrain.userData.wheels=[];
 const tug=new THREE.Mesh(new THREE.BoxGeometry(1.2,.65,1.65),M(0xe9ad35));tug.position.set(0,.58,1.45);baggageTrain.add(tug);
-const tugCab=new THREE.Mesh(new THREE.BoxGeometry(1,.65,.85),glass);tugCab.position.set(0,1.05,1.85);baggageTrain.add(tugCab);\nfor(const x of [-.48,.48])for(const z of [.85,2.0]){const w=new THREE.Mesh(new THREE.CylinderGeometry(.2,.2,.13,12),dark);w.rotation.z=Math.PI/2;w.position.set(x,.22,z);baggageTrain.add(w);baggageTrain.userData.wheels.push(w)}
+const tugCab=new THREE.Mesh(new THREE.BoxGeometry(1,.65,.85),glass);tugCab.position.set(0,1.05,1.85);baggageTrain.add(tugCab);;
+for(const x of [-.48,.48])for(const z of [.85,2.0]){const w=new THREE.Mesh(new THREE.CylinderGeometry(.2,.2,.13,12),dark);w.rotation.z=Math.PI/2;w.position.set(x,.22,z);baggageTrain.add(w);baggageTrain.userData.wheels.push(w)}
 for(let n=0;n<2;n++){
  const cart=new THREE.Group(),base=new THREE.Mesh(new THREE.BoxGeometry(1.45,.22,1.75),M(0x596b78));base.position.y=.55;cart.add(base);
  for(const x of [-.48,.0,.48]){const bag=new THREE.Mesh(new THREE.BoxGeometry(.38,.48,.48),M(n?0x315b91:0xb16c42));bag.position.set(x,.88,0);cart.add(bag)}
