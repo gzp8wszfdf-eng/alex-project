@@ -787,6 +787,7 @@ const fleetModels=[
 // На исходном перроне помещаются четыре детализированных самолёта; остальные остаются во флоте.
 const fleetSlots=[[-21,17],[-7,17],[7,17],[21,17]];
 function rebuildFleetDisplay(){
+ fleetDisplay.children.slice().forEach(g=>g.traverse(o=>{if(o.geometry)o.geometry.dispose();if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else if(o.material)o.material.dispose()}));
  fleetDisplay.clear();
  const owned=[];
  for(const [model,color,scale] of fleetModels)for(let n=0;n<Math.max(0,lv.aircraft[model]||0);n++)owned.push({model,color,scale});
