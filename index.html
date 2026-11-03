@@ -359,8 +359,27 @@ function serviceVan(x,z,color=0xf2bb45,type='cart'){
   const w=new THREE.Mesh(new THREE.CylinderGeometry(isBus?.28:.22,isBus?.28:.22,.16,14),rubber);w.rotation.z=Math.PI/2;w.position.set(xx,.28,zz);g.add(w);wheels.push(w);
   const hub=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,.17,12),rim);hub.rotation.z=Math.PI/2;hub.position.copy(w.position);g.add(hub);
  }
- for(const side of [-1,1]){const head=new THREE.Mesh(new THREE.BoxGeometry(.24,.12,.05),M(0xffefbd,.25));head.position.set(side*(isBus?1:.58),.65,isBus?2.22:1.27);g.add(head);const rear=new THREE.Mesh(new THREE.BoxGeometry(.2,.12,.05),M(0xe34b42,.3));rear.position.set(side*(isBus?1:.58),.62,isBus?-2.22:-1.27);g.add(rear)}
- if(type==='cart'){const beacon=new THREE.Mesh(new THREE.SphereGeometry(.09,10,8),M(0xffb52e,.25));beacon.position.set(0,1.12,.25);g.add(beacon)}
+ // Детали кузова: бамперы, решётка, двери, зеркала и светотехника.
+ const frontZ=isBus?2.22:1.27,rearZ=isBus?-2.22:-1.27,halfW=isBus?1.25:.825;
+ const bumper=new THREE.Mesh(new THREE.BoxGeometry(isBus?2.56:1.72,.16,.16),dark);bumper.position.set(0,.38,frontZ+.04);g.add(bumper);
+ const rearBumper=bumper.clone();rearBumper.position.z=rearZ-.04;g.add(rearBumper);
+ const grille=new THREE.Mesh(new THREE.BoxGeometry(isBus?.72:.48,.22,.035),M(0x26323a,.75));grille.position.set(0,isBus?.72:.57,frontZ+.095);g.add(grille);
+ for(let k=0;k<4;k++){const slat=new THREE.Mesh(new THREE.BoxGeometry(isBus?.62:.4,.018,.045),rim);slat.position.set(0,(isBus?.65:.5)+k*.055,frontZ+.12);g.add(slat)}
+ for(const side of [-1,1]){
+  const head=new THREE.Mesh(new THREE.BoxGeometry(isBus?.32:.25,.14,.07),M(0xfff1c8,.18));head.position.set(side*(isBus?1.02:.59),isBus?.78:.72,frontZ+.075);g.add(head);
+  const rear=new THREE.Mesh(new THREE.BoxGeometry(.22,.2,.07),M(0xe32929,.22));rear.position.set(side*(isBus?1.02:.59),.68,rearZ-.075);g.add(rear);
+  const mirror=new THREE.Mesh(new THREE.BoxGeometry(.16,.12,.22),bodyMat);mirror.position.set(side*(isBus?1.34:.94),isBus?1.48:1.03,frontZ-.12);g.add(mirror);
+  const step=new THREE.Mesh(new THREE.BoxGeometry(.12,.12,isBus?3.2:1.45),dark);step.position.set(side*(isBus?1.28:.88),.34,0);g.add(step);
+  if(!isBus){for(const zz of [-.72,.72]){const arch=new THREE.Mesh(new THREE.TorusGeometry(.25,.045,7,18,Math.PI),dark);arch.rotation.z=Math.PI;arch.position.set(side*.62,.31,zz);g.add(arch)}}
+ }
+ if(isBus){
+  const destination=new THREE.Mesh(new THREE.BoxGeometry(.9,.16,.035),M(0x182a32));destination.position.set(0,1.72,frontZ+.025);g.add(destination);
+  const door=new THREE.Mesh(new THREE.BoxGeometry(.035,.82,.72),M(0x9fc6d1,.25));door.position.set(1.265,.99,-.55);g.add(door);
+ }else{
+  const rearDoor=new THREE.Mesh(new THREE.BoxGeometry(1.2,.05,.035),dark);rearDoor.position.set(0,.98,-1.26);g.add(rearDoor);
+  const loadRail=new THREE.Mesh(new THREE.BoxGeometry(1.35,.07,1.18),rim);loadRail.position.set(0,1.2,-.48);g.add(loadRail);
+  const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.1,.1,.12,10),M(0xffb52e,.2));beacon.position.set(0,1.15,.2);g.add(beacon);
+ }
  g.userData.wheels=wheels;g.position.set(x,0,z);world.add(g);serviceVehicles.push(g);return g;
 }
 serviceVan(-34,-20,0xf4c04f,'cart');
@@ -583,7 +602,14 @@ if(serviceCycle<7){
 }else{
  const u=(serviceCycle-55)/17;departing.position.set(mix(29,57,u),mix(3.6,20,u),mix(-44,-57,u));departing.rotation.y=Math.PI/2;departing.rotation.z=-.12;
 }
-serviceVehicles.forEach((v,i)=>{const a=(t*.075+i*.19)%(Math.PI*2),rx=11.2,rz=2.7;v.position.set(-20+Math.cos(a)*rx,0,-13+Math.sin(a)*rz);v.rotation.y=Math.atan2(-Math.sin(a)*rz,Math.cos(a)*rx);v.userData.wheels?.forEach(w=>w.rotation.x+=.14)});
+// Наземный транспорт движется по двум параллельным полосам перрона.
+serviceVehicles.forEach((v,i)=>{
+ const phase=(t*.045+(i%4)*.5)%2,forward=phase<1;
+ const u=forward?phase:2-phase,x=-42+u*84;
+ v.position.set(x,0,i<4?-19:-25);
+ v.rotation.y=forward?Math.PI/2:-Math.PI/2;
+ v.userData.wheels?.forEach(w=>w.rotation.x+=forward?-.12:.12);
+});
 // Топливо и багаж обслуживают именно тот самолёт, который стоит у гейта.
 const fuelActive=serviceCycle>12&&serviceCycle<29;
 flightFuel.visible=fuelActive;
