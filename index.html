@@ -18,7 +18,7 @@ main{position:static;max-width:none;margin:0;padding:0}
 #threeWorld canvas{width:100%!important;height:100%!important;touch-action:none}
 /* Надёжный резервный аэропорт, если WebGL/Three.js не запустился на телефоне */
 #world{display:block!important;position:absolute;inset:0;z-index:2;width:100%!important;height:100%!important;pointer-events:none}
-html.three-ready #world{display:none!important}
+/* Резервная 2D-сцена остаётся поверх 3D-фона */
 
 #world,.legend,.xp{display:none!important}
 .panel{display:none;position:fixed;z-index:30;left:10px;right:10px;bottom:calc(76px + env(safe-area-inset-bottom));max-height:48dvh;overflow:auto;margin:0;background:rgba(13,27,44,.97);border:1px solid #ffffff24;box-shadow:0 12px 40px #0008;backdrop-filter:blur(18px)}
@@ -452,7 +452,7 @@ boardingPeople.forEach((p,i)=>{
 });
 const daylight=(Math.sin(t*.035-1.2)+1)/2;const night=1-daylight;sun.intensity=.35+1.95*daylight;scene.background.setRGB(.035+.57*daylight,.075+.68*daylight,.15+.70*daylight);scene.fog.color.copy(scene.background);const weather=document.getElementById('weather');if(weather)weather.textContent=daylight>.62?'☀ ДЕНЬ · 22°':daylight<.28?'🌙 НОЧЬ · 14°':'🌆 ВЕЧЕР · 18°';lights.forEach(l=>{l.material.emissiveIntensity=.12+night*.9});cars.forEach((c,i)=>{const phase=(t*.13+i*.23)%1,slot=-33+i*6;c.position.x=phase<.55?-39+(slot+39)*(phase/.55):slot;c.position.z=phase<.55?31:27+(i%2)*3;c.rotation.y=phase<.55?Math.PI/2:0});people.forEach((p,i)=>{const q=p.userData,phase=(t*.42+q.phase)%1;p.position.x=-25+phase*18;p.position.z=25+Math.sin(t*.8+q.phase)*1.5;q.leg1.rotation.x=Math.sin(t*7+q.phase)*.45;q.leg2.rotation.x=-Math.sin(t*7+q.phase)*.45});
 // Чемоданы движутся по ленте выдачи багажа.
-baggageBags.forEach((bag,i)=>{const phase=(t*.42+i*.2)%1;bag.position.z=2.9+phase*5.5;bag.position.x=7+Math.sin(t*1.8+i)*.08});lights.forEach((l,i)=>{l.material.emissive=new THREE.Color(0xffdf85);l.material.emissiveIntensity=.12+night*.9});renderer.render(scene,camera);document.documentElement.classList.add("three-ready")}animate();
+baggageBags.forEach((bag,i)=>{const phase=(t*.42+i*.2)%1;bag.position.z=2.9+phase*5.5;bag.position.x=7+Math.sin(t*1.8+i)*.08});lights.forEach((l,i)=>{l.material.emissive=new THREE.Color(0xffdf85);l.material.emissiveIntensity=.12+night*.9});renderer.render(scene,camera)}animate();
 </script>
 
 
