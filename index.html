@@ -146,7 +146,7 @@ requestAnimationFrame(draw)}draw();
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 const host=document.getElementById('threeWorld');
 const save=(()=>{try{return JSON.parse(localStorage.getItem('airportEmpireSave')||'{}')}catch{return {}}})();
-const lv={terminal:Math.max(1,save.terminal||1),runway:Math.max(1,save.runway||1),staff:Math.max(1,save.staff||1),service:Math.max(1,save.service||1),fleet:Math.max(1,save.fleet||1),aircraft:{commuter:save.aircraft?.commuter||1,jet:save.aircraft?.jet||0,cargo:save.aircraft?.cargo||0}};
+const lv={terminal:Math.max(1,save.terminal||1),runway:Math.max(1,save.runway||1),staff:Math.max(1,save.staff||1),service:Math.max(1,save.service||1),fleet:Math.max(1,save.fleet||1),aircraft:{commuter:save.aircraft?.commuter||1,jet:save.aircraft?.jet||0,cargo:save.aircraft?.cargo||0,turboprop:save.aircraft?.turboprop||0,narrow:save.aircraft?.narrow||0,wide:save.aircraft?.wide||0,jumbo:save.aircraft?.jumbo||0,supersonic:save.aircraft?.supersonic||0}};
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x9bc8d8);scene.fog=new THREE.Fog(0x9bc8d8,75,150);
 const camera=new THREE.PerspectiveCamera(42,1,.1,260);
 const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;host.appendChild(renderer.domElement);
@@ -604,7 +604,7 @@ for(let x=-65;x<=65;x+=5){
 for(let i=0;i<28;i++){const g=new THREE.Group(),tr=new THREE.Mesh(new THREE.CylinderGeometry(.14,.2,1.1,7),M(0x76553b)),top=new THREE.Mesh(new THREE.SphereGeometry(.9,8,7),M(i%2?0x368458:0x4b9a62));tr.position.y=.55;top.position.y=1.55;g.add(tr,top);g.position.set(-48+(i%14)*7,0,44+Math.floor(i/14)*7);world.add(g)}
 function plane(x,z,scale=1,color=0xf2f4f5,model='jet'){
  const g=new THREE.Group(),landingWheels=[],body=M(color,.34),stripe=M(model==='cargo'?0xe5a83b:0x267da7,.32),engine=M(0x53616c,.55),glassCockpit=M(0x18394c,.18);
- const len=model==='cargo'?9.2:model==='commuter'?6.3:8.1,w=model==='cargo'?12:model==='commuter'?7.8:11.2;
+ const specs={commuter:[6.3,7.8],turboprop:[6.8,8.4],cargo:[9.2,12],jet:[8.1,11.2],narrow:[10.2,13.5],wide:[12.8,17],jumbo:[15.5,20],supersonic:[13.2,12.5]};const [len,w]=specs[model]||specs.jet;
  // Tapered fuselage: a rounded nose, full passenger cabin and narrow tail.
  const radius=model==='cargo'?.58:.43;
  const fuselageProfile=[
@@ -648,7 +648,7 @@ function plane(x,z,scale=1,color=0xf2f4f5,model='jet'){
  g.userData.landingWheels=landingWheels;
  g.position.set(x,0,z);g.scale.setScalar(scale);world.add(g);return g
 }
-const planes=[plane(-24,-7,.78,0xf4f6fa,'commuter'),plane(12,-7,.72,lv.fleet>=2?0xd9e9f4:0xf4f6fa,'jet'),...Array.from({length:Math.min(5,lv.fleet-1)},(_,i)=>plane(-28+i*13,17,.48,i%2?0xf0d9a0:0xe8f1fa,'commuter')),...Array.from({length:Math.min(3,lv.aircraft.jet)},(_,i)=>plane(-25+i*18,23,.68,0xeaf4ff,'jet')),...Array.from({length:Math.min(3,lv.aircraft.cargo)},(_,i)=>plane(-26+i*17,29,.61,0xf0d9a0,'cargo'))];planes[1].rotation.y=Math.PI;
+const planes=[plane(-24,-7,.78,0xf4f6fa,'commuter'),plane(12,-7,.72,lv.fleet>=2?0xd9e9f4:0xf4f6fa,'jet'),...Array.from({length:Math.min(5,lv.fleet-1)},(_,i)=>plane(-28+i*13,17,.48,i%2?0xf0d9a0:0xe8f1fa,'commuter')),...[['turboprop',0xeee8d5,.58],['cargo',0xf0d9a0,.61],['narrow',0xeaf4ff,.68],['wide',0xdceaf4,.72],['jumbo',0xf4f6fa,.78],['supersonic',0xe8f0ff,.7]].flatMap(([model,color,scale],row)=>Array.from({length:Math.min(3,lv.aircraft[model]||0)},(_,i)=>plane(-26+i*18,23+row*5,scale,color,model)))];planes[1].rotation.y=Math.PI;
 const runwayLength=54+Math.min(8,lv.runway-1)*5;
 const extraRunway=lv.runway>1?slab(0,-44,runwayLength,5,road):null;
 // runway extension markings
