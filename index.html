@@ -368,6 +368,10 @@ serviceVan(-25,-20,0xe9edf0,'cart');
 serviceVan(-16,-20,0xe8a83b,'cart');
 serviceVan(-7,-20,0xf0f0e8,'bus');
 serviceVan(5,-20,0xe5ad39,'cart');
+// Дополнительная техника на правой стороне перрона — отдельные места с безопасными интервалами.
+serviceVan(15,-20,0xf0f0e8,'bus');
+serviceVan(25,-20,0xe5ad39,'cart');
+serviceVan(35,-20,0xf4c04f,'cart');
 // Спецтехника рейса: топливозаправщик с цистерной и багажные платформы.
 const flightFuel=new THREE.Group();
 const fuelBase=new THREE.Mesh(new THREE.BoxGeometry(1.55,.72,3.1),M(0xe5c13b));fuelBase.position.y=.62;flightFuel.add(fuelBase);
