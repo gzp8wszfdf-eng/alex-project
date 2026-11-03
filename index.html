@@ -130,6 +130,26 @@ box(17,0,5,5,13,5,wall);box(16.7,13,5,7,1.4,7,blue);box(16.7,14.4,5,6,.25,6,glas
 // Hangars and service buildings unlock with service upgrades
 box(29,0,13,14,4,12,wall);box(29,4,13,14,.7,12,yellow);
 for(let i=0;i<Math.min(6,lv.service-1);i++){const x=30+(i%3)*11,z=29+Math.floor(i/3)*12;box(x,0,z,8,4,8,wall);box(x,4,z,8,.5,8,roof);box(x,1,z-4.08,4,2.2,.12,blue)}
+// Световые полосы и номера стоянок у терминала
+for(let i=0;i<7;i++){
+ const x=-24+i*7;
+ slab(x,-2.2,5.8,.18,white,.19);
+ slab(x-2.8,-5.2,.18,5.8,white,.19);
+ slab(x+2.8,-5.2,.18,5.8,white,.19);
+ slab(x,-8.1,5.8,.18,white,.19);
+ const gateLamp=new THREE.Mesh(new THREE.SphereGeometry(.22,8,6),M(0x62d9ff,.55));
+ gateLamp.position.set(x,.42,-2.2);world.add(gateLamp);lights.push(gateLamp);
+}
+// Подсветка фасада и дополнительный стеклянный этаж терминала
+for(let x=-17;x<8;x+=3.5){
+ const glow=new THREE.Mesh(new THREE.BoxGeometry(2.45,.12,.18),M(0x9ee8ff,.65));
+ glow.position.set(x,4.85,.18);terminal.add(glow);
+}
+box(-5,6.05,1.05,23,.12,.22,yellow,terminal);
+for(let x=-16;x<7;x+=4){
+ const pillar=box(x,0,1.1,.22,4.7,.22,roof,terminal);
+ const cap=box(x,4.72,1.1,.42,.16,.34,yellow,terminal);
+}
 // Jet bridges and gate markings
 for(let i=0;i<Math.min(8,2+lv.terminal);i++){const x=-22+i*6;slab(x,1,1.1,10,white,.18);box(x,0,2,1.2,1.2,4,yellow);box(x,1.2,2,1.2,.18,4,dark)}
 // Parking lot and cars
