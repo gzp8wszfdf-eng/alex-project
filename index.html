@@ -17,7 +17,9 @@ main{position:static;max-width:none;margin:0;padding:0}
 #threeWorld{position:absolute;inset:0;width:100%!important;height:100%!important;z-index:1}
 #threeWorld canvas{width:100%!important;height:100%!important;touch-action:none}
 /* Надёжный резервный аэропорт, если WebGL/Three.js не запустился на телефоне */
-#world{display:block!important;position:absolute;inset:0;z-index:2;width:100%!important;height:100%!important;pointer-events:none}
+#world{display:block!important;position:absolute;inset:0;z-index:1;width:100%!important;height:100%!important;pointer-events:none}
+#threeWorld{z-index:2!important}
+body.webgl-ready #world{display:none!important}
 /* Резервная 2D-сцена остаётся поверх 3D-фона */
 
 .legend,.xp{display:none!important}
@@ -147,7 +149,7 @@ const save=(()=>{try{return JSON.parse(localStorage.getItem('airportEmpireSave')
 const lv={terminal:Math.max(1,save.terminal||1),runway:Math.max(1,save.runway||1),staff:Math.max(1,save.staff||1),service:Math.max(1,save.service||1),fleet:Math.max(1,save.fleet||1),aircraft:{commuter:save.aircraft?.commuter||1,jet:save.aircraft?.jet||0,cargo:save.aircraft?.cargo||0}};
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x9bc8d8);scene.fog=new THREE.Fog(0x9bc8d8,75,150);
 const camera=new THREE.PerspectiveCamera(42,1,.1,260);
-const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;host.appendChild(renderer.domElement);
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;host.appendChild(renderer.domElement);document.body.classList.add('webgl-ready');
 scene.add(new THREE.HemisphereLight(0xe8f6ff,0x58764e,2));
 const sun=new THREE.DirectionalLight(0xfff0d5,2.2);sun.position.set(-25,48,25);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);scene.add(sun);
 const M=(c,r=.8)=>new THREE.MeshStandardMaterial({color:c,roughness:r});
