@@ -494,15 +494,25 @@ const tank=new THREE.Mesh(new THREE.CylinderGeometry(.52,.52,2.35,16),M(0xf1f3f4
 const fuelCab=new THREE.Mesh(new THREE.BoxGeometry(1.35,.78,.95),glass);fuelCab.position.set(0,1.08,1.05);flightFuel.add(fuelCab);
 for(const x of [-.62,.62])for(const z of [-.95,.95]){const w=new THREE.Mesh(new THREE.CylinderGeometry(.22,.22,.14,12),dark);w.rotation.z=Math.PI/2;w.position.set(x,.22,z);flightFuel.add(w);flightFuel.userData.wheels.push(w)}
 world.add(flightFuel);
+// Реальный на вид топливный рукав между заправщиком и самолётом у гейта.
+const fuelHoseCurve=new THREE.CatmullRomCurve3([
+ new THREE.Vector3(-15,.92,-8),new THREE.Vector3(-17,1.25,-7.8),
+ new THREE.Vector3(-19.5,1.05,-7.55),new THREE.Vector3(-22,.88,-7.2)
+]);
+const fuelHose=new THREE.Mesh(new THREE.TubeGeometry(fuelHoseCurve,24,.045,8,false),M(0x202a32,.7));
+fuelHose.visible=false;world.add(fuelHose);
+const fuelNozzle=new THREE.Mesh(new THREE.CylinderGeometry(.075,.075,.28,10),M(0xb9c4cb,.35));
+fuelNozzle.rotation.z=Math.PI/2;fuelNozzle.position.set(-22,.9,-7.2);fuelNozzle.visible=false;world.add(fuelNozzle);
 const baggageTrain=new THREE.Group();baggageTrain.userData.wheels=[];
 const tug=new THREE.Mesh(new THREE.BoxGeometry(1.2,.65,1.65),M(0xe9ad35));tug.position.set(0,.58,1.45);baggageTrain.add(tug);
 const tugCab=new THREE.Mesh(new THREE.BoxGeometry(1,.65,.85),glass);tugCab.position.set(0,1.05,1.85);baggageTrain.add(tugCab);;
 for(const x of [-.48,.48])for(const z of [.85,2.0]){const w=new THREE.Mesh(new THREE.CylinderGeometry(.2,.2,.13,12),dark);w.rotation.z=Math.PI/2;w.position.set(x,.22,z);baggageTrain.add(w);baggageTrain.userData.wheels.push(w)}
+const baggageCarts=[];
 for(let n=0;n<2;n++){
  const cart=new THREE.Group(),base=new THREE.Mesh(new THREE.BoxGeometry(1.45,.22,1.75),M(0x596b78));base.position.y=.55;cart.add(base);
  for(const x of [-.48,.0,.48]){const bag=new THREE.Mesh(new THREE.BoxGeometry(.38,.48,.48),M(n?0x315b91:0xb16c42));bag.position.set(x,.88,0);cart.add(bag)}
  for(const x of [-.56,.56])for(const z of [-.58,.58]){const w=new THREE.Mesh(new THREE.CylinderGeometry(.15,.15,.12,10),dark);w.rotation.z=Math.PI/2;w.position.set(x,.2,z);cart.add(w);baggageTrain.userData.wheels.push(w)}
- cart.position.z=-.9-n*2.1;baggageTrain.add(cart);
+ cart.position.z=-.9-n*2.1;baggageTrain.add(cart);baggageCarts.push(cart);
 }
 world.add(baggageTrain);
 function buildCar(color=0x2f82b8,type='sedan'){
@@ -747,8 +757,18 @@ serviceVehicles.forEach((v,i)=>driveAirportRoute(v,serviceRoutes[i],t*.82+i*2.7,
 // Отдельные спецмашины выполняют полный цикл: выезд, обслуживание самолёта и возвращение.
 flightFuel.visible=true;
 driveAirportRoute(flightFuel,[{x:-38,z:-20},{x:-32,z:-18},{x:-24,z:-13},{x:-15,z:-8,wait:10},{x:-22,z:-13},{x:-31,z:-18}],t*.58,2.1);
+// Шланг подключается только на время стоянки заправщика у борта.
+const fuelPhase=(t*.58)%35.5,fueling=fuelPhase>12.4&&fuelPhase<22.4;
+fuelHose.visible=fueling;fuelNozzle.visible=fueling;
+if(fueling){fuelHose.material.emissiveIntensity=.12+.05*Math.sin(t*3);fuelNozzle.rotation.x=.08*Math.sin(t*2)}
 baggageTrain.visible=true;
 driveAirportRoute(baggageTrain,[{x:-42,z:-20},{x:-39,z:-15},{x:-35,z:-11,wait:5},{x:-31,z:-8,wait:8},{x:-35,z:-13},{x:-42,z:-20}],t*.62,2.35);
+// Багаж на тележках слегка приподнимается при погрузке и укладке у самолёта.
+const baggagePhase=(t*.62)%31.5,loadingBags=(baggagePhase>4.8&&baggagePhase<9.8)||(baggagePhase>12&&baggagePhase<20);
+baggageCarts.forEach((cart,i)=>cart.children.slice(1,4).forEach((bag,j)=>{
+ const baseY=.88+(loadingBags?.13*Math.abs(Math.sin(t*3.2+i+j)):0);
+ bag.position.y=baseY;
+}));
 // Посадка: пассажиры выходят из терминала и подходят к борту во время стоянки.
 boardingPeople.forEach((p,i)=>{
  const q=p.userData,walk=serviceCycle-8-q.offset;
