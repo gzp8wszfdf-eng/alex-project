@@ -3,7 +3,29 @@
 <style>
 :root{--bg:#0c1525;--panel:#17253a;--panel2:#20334d;--gold:#ffc85a;--mint:#54d6ad;--text:#f4f7fc;--muted:#9aabc1}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,sans-serif;padding-bottom:30px}header{padding:17px 16px 14px;background:linear-gradient(135deg,#142b47,#263d5b);border-bottom:1px solid #ffffff18;position:sticky;top:0;z-index:5}.top{display:flex;justify-content:space-between;align-items:center}.logo{font-weight:900;font-size:18px;letter-spacing:.2px}.tag{font-size:10px;color:#a9c6e7;background:#ffffff12;padding:6px 9px;border-radius:20px}.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:13px}.stat{background:#ffffff0d;border:1px solid #ffffff12;border-radius:12px;padding:9px}.stat small{display:block;color:#aabbd0;font-size:10px}.stat b{font-size:17px}.stat b.gold{color:var(--gold)}main{max-width:760px;margin:auto;padding:12px}.scene{background:#162b3c;border:1px solid #2d4960;border-radius:18px;overflow:hidden;box-shadow:0 12px 35px #0005}.scenehead{display:flex;justify-content:space-between;padding:13px 14px 4px;align-items:center}.scenehead b{font-size:14px}.scenehead span{font-size:10px;color:#a9c1d5}canvas{display:block;width:100%;height:auto;touch-action:pan-y}.legend{display:flex;gap:12px;flex-wrap:wrap;padding:9px 14px 13px;color:#a9bbca;font-size:10px}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px}.xp{padding:12px 2px 14px}.xphead{display:flex;justify-content:space-between;color:var(--muted);font-size:11px}.bar{height:7px;background:#26374c;border-radius:8px;margin-top:7px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#42b6ec,#59dfad);width:0%}.panel{background:var(--panel);border:1px solid #ffffff10;border-radius:16px;padding:14px;margin-top:12px}.panel h2{font-size:14px;margin:0 0 12px}.row{display:flex;justify-content:space-between;align-items:center;gap:10px}.muted{color:var(--muted);font-size:11px;line-height:1.45}.btn{border:0;border-radius:11px;background:linear-gradient(135deg,#2689d7,#2464a9);color:white;font-weight:800;font-size:12px;padding:11px 13px;cursor:pointer}.btn:disabled{opacity:.35}.btn.gold{background:linear-gradient(135deg,#ffd36e,#eaa52e);color:#392607}.btn.green{background:linear-gradient(135deg,#41c89a,#239a77)}.flight{display:flex;align-items:center;gap:11px;padding:10px 0;border-top:1px solid #ffffff10}.flight:first-of-type{border-top:0}.planeicon{font-size:26px;background:#ffffff0c;border-radius:11px;padding:8px}.flightinfo{flex:1;min-width:0}.flightinfo b{font-size:12px;display:block}.flightinfo small{font-size:10px;color:var(--muted)}.upgradegrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.upgrade{background:var(--panel2);border:1px solid #ffffff0d;border-radius:13px;padding:11px}.upgrade .emoji{font-size:22px}.upgrade b{display:block;font-size:12px;margin:4px 0}.upgrade p{font-size:10px;color:var(--muted);min-height:27px;margin:0 0 9px}.upgrade .btn{width:100%;padding:9px 5px;font-size:10px}.task{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-top:1px solid #ffffff10;font-size:11px}.toast{position:fixed;z-index:9;bottom:18px;left:50%;transform:translateX(-50%);background:#f3c45b;color:#30220a;padding:11px 16px;border-radius:22px;font-size:12px;font-weight:800;opacity:0;transition:.2s;pointer-events:none}.toast.show{opacity:1}@media(min-width:560px){main{padding:18px}.upgradegrid{grid-template-columns:repeat(4,1fr)}header{padding-left:max(16px,calc((100% - 724px)/2));padding-right:max(16px,calc((100% - 724px)/2))}}
-#threeWorld canvas{display:block;width:100%;height:100%;touch-action:none}\n</style></head><body>
+#threeWorld canvas{display:block;width:100%;height:100%;touch-action:none}\n
+/* FULLSCREEN TYCOON LAYOUT */
+html,body{width:100%;height:100%;margin:0;overflow:hidden;overscroll-behavior:none}
+body{padding:0;background:#101b2a}
+header{position:fixed;top:0;left:0;right:0;z-index:20;padding:calc(env(safe-area-inset-top) + 10px) 14px 10px;background:linear-gradient(180deg,rgba(10,20,34,.94),rgba(10,20,34,.72));border:0;backdrop-filter:blur(12px)}
+.logo{font-size:15px}.tag{font-size:10px}.stats{margin-top:8px;gap:6px}.stat{padding:6px 9px;background:#07111e99}.stat b{font-size:15px}
+main{position:static;max-width:none;margin:0;padding:0}
+.scene{position:fixed;inset:0;border:0;border-radius:0;box-shadow:none;background:#9bc8d8;overflow:hidden}
+.scenehead{position:absolute;top:calc(env(safe-area-inset-top) + 100px);left:14px;right:14px;z-index:3;padding:7px 10px;background:#102238aa;border:1px solid #ffffff25;border-radius:12px;backdrop-filter:blur(8px)}
+.scenehead b{font-size:11px}.scenehead span{font-size:10px}
+#threeWorld{position:absolute;inset:0;width:100%!important;height:100%!important;z-index:1}
+#threeWorld canvas{width:100%!important;height:100%!important;touch-action:none}
+#world,.legend,.xp{display:none!important}
+.panel{display:none;position:fixed;z-index:30;left:10px;right:10px;bottom:calc(76px + env(safe-area-inset-bottom));max-height:48dvh;overflow:auto;margin:0;background:rgba(13,27,44,.97);border:1px solid #ffffff24;box-shadow:0 12px 40px #0008;backdrop-filter:blur(18px)}
+.panel.active{display:block}
+#gameDock{position:fixed;z-index:40;left:0;right:0;bottom:0;padding:9px 10px calc(9px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(4,1fr);gap:7px;background:linear-gradient(0deg,#0a1423 75%,#0a1423e8);border-top:1px solid #ffffff1c}
+.dockBtn{border:1px solid #ffffff14;border-radius:13px;background:#1b3048;color:#eaf3fc;padding:9px 3px 8px;font:700 10px system-ui;display:flex;flex-direction:column;align-items:center;gap:4px}
+.dockBtn span{font-size:20px}.dockBtn.active{background:linear-gradient(145deg,#2d6e91,#245078);border-color:#71c9df}
+#closeSheet{position:fixed;z-index:35;right:18px;bottom:calc(57dvh + 80px);display:none;border:0;border-radius:50%;width:34px;height:34px;background:#243d58;color:white;font-size:18px}
+.toast{bottom:calc(78px + env(safe-area-inset-bottom));z-index:60}
+@media(min-width:700px){.panel{left:auto;right:18px;width:390px;max-height:55dvh;bottom:85px}#gameDock{left:50%;right:auto;transform:translateX(-50%);width:min(520px,100%);border-radius:18px 18px 0 0}.scenehead{top:115px;left:24px;width:280px}}
+
+</style></head><body>
 <header><div class="top"><div><div class="logo">✈ IDLE AIRPORT EMPIRE</div><div class="muted">Построй аэропорт мирового уровня</div></div><span class="tag" id="levelTag">УРОВЕНЬ 1</span></div><div class="stats"><div class="stat"><small>💰 Деньги</small><b class="gold" id="money">500</b></div><div class="stat"><small>📈 Доход / мин</small><b id="income">12</b></div><div class="stat"><small>🧍 Пассажиры</small><b id="pax">24</b></div></div></header>
 <main><section class="scene"><div class="scenehead"><b>🌍 ТВОЙ АЭРОПОРТ</b><span id="weather">☀ ЯСНО · 22°</span></div><div id="threeWorld" style="width:100%;height:360px;touch-action:none"></div><canvas id="world" width="900" height="570" style="display:none"></canvas><div class="legend"><span><i class="dot" style="background:#51d9b1"></i>Терминал</span><span><i class="dot" style="background:#aab7c8"></i>ВПП</span><span><i class="dot" style="background:#ffc85a"></i>Самолёт</span><span>✦ Объекты оживают со временем</span></div></section>
 <div class="xp"><div class="xphead"><span>РЕПУТАЦИЯ АЭРОПОРТА</span><b id="xptext">0 / 100 XP</b></div><div class="bar"><i id="xpbar"></i></div></div>
@@ -101,4 +123,18 @@ renderer.domElement.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId))
 function up(e){pts.delete(e.pointerId);if(pts.size<2)pinch=0}renderer.domElement.addEventListener('pointerup',up);renderer.domElement.addEventListener('pointercancel',up);
 renderer.domElement.addEventListener('wheel',e=>{radius=Math.max(25,Math.min(80,radius+e.deltaY*.04));cam()},{passive:true});
 const clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();p1.position.x=-20+(t*2.2%40);p2.position.y=.04*Math.sin(t*2);cars.forEach((c,i)=>{c.position.set(-8+(t*1.2+i*5)%18,.02,13+Math.sin(t+i)*1.2)});renderer.render(scene,camera)}animate();
-</script>\n</body></html>
+</script>\n
+<script>
+(()=>{
+ const panels=[...document.querySelectorAll('main>.panel')];
+ const labels=[['✈️','Рейсы'],['🏗️','Здания'],['👥','Персонал'],['📈','Развитие']];
+ const dock=document.createElement('nav');dock.id='gameDock';
+ labels.forEach(([ico,label],i)=>{const b=document.createElement('button');b.className='dockBtn';b.innerHTML='<span>'+ico+'</span>'+label;b.addEventListener('click',()=>{const target=i===0?panels[0]:i===1?panels[1]:i===2?panels[1]:panels[2];const was=target.classList.contains('active');panels.forEach(p=>p.classList.remove('active'));dock.querySelectorAll('button').forEach(x=>x.classList.remove('active'));if(!was){target.classList.add('active');b.classList.add('active')}});dock.appendChild(b)});
+ document.body.appendChild(dock);
+ const close=document.createElement('button');close.id='closeSheet';close.textContent='×';close.onclick=()=>{panels.forEach(p=>p.classList.remove('active'));dock.querySelectorAll('button').forEach(x=>x.classList.remove('active'))};document.body.appendChild(close);
+ const observer=new MutationObserver(()=>{close.style.display=panels.some(p=>p.classList.contains('active'))?'block':'none'});panels.forEach(p=>observer.observe(p,{attributes:true,attributeFilter:['class']}));
+ // Make the 3D playfield fill the phone screen and recalculate renderer size.
+ const world=document.getElementById('threeWorld');if(world){world.style.height='100dvh';world.style.width='100vw';}
+})();
+</script>
+</body></html>
