@@ -517,7 +517,7 @@ if(arrivalCycle<18){
  arrival.rotation.y=-Math.PI/2;arrival.rotation.z=-.012*Math.sin(u*Math.PI);
 }else if(arrivalCycle<28){
  const u=(arrivalCycle-18)/10;arrival.visible=true;
- arrival.position.set(mix(-36,-8,u),.12,-52);arrival.rotation.y=-Math.PI/2;
+ arrival.position.set(mix(-36,-8,u),.12,-52);arrival.rotation.y=Math.PI/2;
 }else if(arrivalCycle<40){
  const u=(arrivalCycle-28)/12;arrival.visible=true;
  arrival.position.set(mix(-8,12,u),.12,mix(-52,-7,u));arrival.rotation.y=mix(-Math.PI/2,0,u);
@@ -571,13 +571,13 @@ boardingPeople.forEach((p,i)=>{
  }
 });
 const daylight=(Math.sin(t*.035-1.2)+1)/2;const night=1-daylight;sun.intensity=.35+1.95*daylight;scene.background.setRGB(.035+.57*daylight,.075+.68*daylight,.15+.70*daylight);scene.fog.color.copy(scene.background);const weather=document.getElementById('weather');if(weather)weather.textContent=daylight>.62?'☀ ДЕНЬ · 22°':daylight<.28?'🌙 НОЧЬ · 14°':'🌆 ВЕЧЕР · 18°';lights.forEach(l=>{l.material.emissiveIntensity=.12+night*.9});cars.forEach((c,i)=>{
- const cycle=((t-i*4.2)%22+22)%22,slot=curbSlots[i],p=curbPassengers[i];
+ const cycle=((t-i*4.2)%16.8+16.8)%16.8,slot=curbSlots[i],p=curbPassengers[i];
  const smooth=u=>{u=Math.max(0,Math.min(1,u));return u*u*(3-2*u)};
- if(cycle<6){const u=smooth(cycle/6);c.visible=true;c.position.set(-38+(slot+38)*u,.018,19);c.rotation.y=Math.PI/2;}
- else if(cycle<10){c.visible=true;c.position.set(slot,.018,19);c.rotation.y=Math.PI/2;}
- else if(cycle<17){const u=smooth((cycle-10)/7);c.visible=true;c.position.set(slot+(38-slot)*u,.018,19);c.rotation.y=Math.PI/2;}
+ if(cycle<4){const u=smooth(cycle/4);c.visible=true;c.position.set(-38+(slot+38)*u,.018,19);c.rotation.y=Math.PI/2;}
+ else if(cycle<7.5){c.visible=true;c.position.set(slot,.018,19);c.rotation.y=Math.PI/2;}
+ else if(cycle<13){const u=smooth((cycle-7.5)/5.5);c.visible=true;c.position.set(slot+(38-slot)*u,.018,19);c.rotation.y=Math.PI/2;}
  else c.visible=false;
- const walk=cycle-7.2;p.visible=walk>0&&walk<6.5;
+ const walk=cycle-4.6;p.visible=walk>0&&walk<6.5;
  if(p.visible){const u=smooth(walk/6.5);p.position.set(slot+( -5-slot)*u,0,19+(11-19)*u);p.rotation.y=Math.atan2(-8,-5-slot);p.userData.leg1.rotation.x=Math.sin(t*9+i)*.48;p.userData.leg2.rotation.x=-Math.sin(t*9+i)*.48;}
  c.userData.wheels?.forEach(w=>{if(c.visible)w.rotation.x-=.12});
 });people.forEach((p,i)=>{const q=p.userData,phase=(t*.42+q.phase)%1;p.position.x=-25+phase*18;p.position.z=25+Math.sin(t*.8+q.phase)*1.5;q.leg1.rotation.x=Math.sin(t*7+q.phase)*.45;q.leg2.rotation.x=-Math.sin(t*7+q.phase)*.45});
