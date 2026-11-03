@@ -667,6 +667,30 @@ renderer.domElement.addEventListener('wheel',e=>{radius=Math.max(27,Math.min(100
 window.addEventListener('airport-aircraft-bought',e=>{const kind=e.detail||'commuter',color=kind==='cargo'?0xf0d9a0:kind==='jet'?0xeaf4ff:0xd9edf5,scale=kind==='cargo'?.61:kind==='jet'?.68:.48;planes.push(plane(-27+(planes.length%5)*12,-5-(planes.length%2)*9,scale,color,kind))});
 window.airportCamera={zoom:d=>{radius=Math.max(27,Math.min(100,radius+d));cam()},rotate:d=>{theta+=d;cam()},reset:()=>{radius=52;theta=.78;phi=1.02;target.set(0,0,0);cam()}};
 document.getElementById('camZoomIn').onclick=()=>window.airportCamera.zoom(-6);document.getElementById('camZoomOut').onclick=()=>window.airportCamera.zoom(6);document.getElementById('camRotate').onclick=()=>window.airportCamera.rotate(Math.PI/4);document.getElementById('camReset').onclick=()=>window.airportCamera.reset();
+// Мобильный пассажирский трап у стоянки A1.
+const passengerStairs=new THREE.Group();
+const stairBase=new THREE.Mesh(new THREE.BoxGeometry(1.35,.48,2.2),M(0xe6b52e));
+stairBase.position.set(0,.42,0);passengerStairs.add(stairBase);
+const stairCab=new THREE.Mesh(new THREE.BoxGeometry(1.12,.72,.72),glass);
+stairCab.position.set(0,.98,.62);passengerStairs.add(stairCab);
+const stairPlatform=new THREE.Mesh(new THREE.BoxGeometry(1.35,.18,1.15),M(0xd8e0e5));
+stairPlatform.position.set(0,2.05,-1.75);passengerStairs.add(stairPlatform);
+for(let n=0;n<7;n++){
+ const step=new THREE.Mesh(new THREE.BoxGeometry(1.08,.12,.34),M(0x9ba9b2));
+ step.position.set(0,.72+n*.19,-.55-n*.34);passengerStairs.add(step);
+}
+for(const side of [-1,1]){
+ const rail=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,2.35,8),M(0xe8edf0));
+ rail.position.set(side*.59,1.35,-1.55);rail.rotation.x=-.52;passengerStairs.add(rail);
+ const postA=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,.78,8),M(0xe8edf0));
+ postA.position.set(side*.59,.98,-.62);passengerStairs.add(postA);
+ const postB=postA.clone();postB.position.set(side*.59,1.95,-2.45);passengerStairs.add(postB);
+}
+for(const x of [-.55,.55])for(const z of [-.72,.72]){
+ const wheel=new THREE.Mesh(new THREE.CylinderGeometry(.2,.2,.13,12),dark);
+ wheel.rotation.z=Math.PI/2;wheel.position.set(x,.2,z);passengerStairs.add(wheel);
+}
+passengerStairs.position.set(-20.2,0,-7.2);passengerStairs.visible=false;world.add(passengerStairs);
 const clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();const smooth=u=>{u=Math.max(0,Math.min(1,u));return u*u*(3-2*u)};const mix=(a,b,u)=>a+(b-a)*smooth(u);// Прилёт: заход, касание полосы, пробег и руление к стоянке.
 const arrivalCycle=t%72,arrival=planes[0];
 arrival.rotation.z=0;arrival.rotation.y=-Math.PI/2;
@@ -696,6 +720,7 @@ arrivingPeople.forEach((p,i)=>{
 });
 // Цикл рейса: руление к гейту, стоянка и выезд на рулёжную дорожку.
 const serviceCycle=(t%72),gateX=-24;
+passengerStairs.visible=serviceCycle>=7&&serviceCycle<35;
 const departing=planes[1];
 departing.rotation.z=0;
 if(serviceCycle<7){
