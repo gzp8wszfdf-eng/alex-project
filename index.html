@@ -471,7 +471,8 @@ function plane(x,z,scale=1,color=0xf2f4f5,model='jet'){
   const enginePod=new THREE.Mesh(new THREE.CylinderGeometry(.34,.38,1.55,18),engine);enginePod.rotation.x=Math.PI/2;enginePod.position.set(side*w*.23,.83,-.15);g.add(enginePod);
   const intake=new THREE.Mesh(new THREE.CircleGeometry(.29,20),glassCockpit);intake.position.set(side*w*.23,.83,.64);g.add(intake);
   const nav=new THREE.Mesh(new THREE.SphereGeometry(.12,10,8),M(side<0?0xff3434:0x37ee89,.2));nav.position.set(side*w*.49,1.18,-.1);g.add(nav);
-  for(let n=0;n<5;n++){const win=new THREE.Mesh(new THREE.SphereGeometry(.075,8,6),glassCockpit);win.scale.set(1,.7,.45);win.position.set(side*.0,1.36,len*.24-n*.43);g.add(win)}
+  const cabinStripe=new THREE.Mesh(new THREE.BoxGeometry(.035,.105,len*.62),stripe);cabinStripe.position.set(side*(model==='cargo'?.565:.418),1.12,-.02);g.add(cabinStripe);
+  for(let n=0;n<6;n++){const win=new THREE.Mesh(new THREE.SphereGeometry(.065,10,8),glassCockpit);win.scale.set(.34,.78,1.05);win.position.set(side*(model==='cargo'?.565:.418),1.39,len*.22-n*.39);g.add(win)}
   const strut=new THREE.Mesh(new THREE.CylinderGeometry(.055,.07,.62,10),dark);strut.position.set(side*1.5,.45,.45);g.add(strut);
   const wheel=new THREE.Mesh(new THREE.CylinderGeometry(.2,.2,.13,14),dark);wheel.rotation.z=Math.PI/2;wheel.position.set(side*1.5,.16,.45);g.add(wheel);landingWheels.push(wheel);
  }
