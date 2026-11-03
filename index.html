@@ -57,22 +57,7 @@ main{position:static;max-width:none;margin:0;padding:0}
 @media(min-width:700px){#empireLeft{left:22px;top:145px;width:190px;padding:16px}#empireRight{right:22px;top:145px;width:220px;padding:16px}#empireUpgrade{left:22px;bottom:95px;width:360px}}
 </style></head><body>
 <header><div class="top"><div><div class="logo">✈ IDLE AIRPORT EMPIRE</div><div class="muted">Построй аэропорт мирового уровня</div></div><span class="tag" id="levelTag">УРОВЕНЬ 1</span></div><div class="stats"><div class="stat"><small>💰 Деньги</small><b class="gold" id="money">500</b></div><div class="stat"><small>📈 Доход / мин</small><b id="income">12</b></div><div class="stat"><small>🧍 Пассажиры</small><b id="pax">24</b></div></div></header>
-<div id="empireLeft" class="empireCard">
- <div class="empireLabel">✈ РЕЙСЫ СЕГОДНЯ</div><strong id="hudFlights">08</strong>
- <div class="empireDivider"></div>
- <div class="empireLabel">👥 ПАССАЖИРЫ</div><strong id="hudPassengers">24</strong>
- <div class="empireDivider"></div>
- <div class="empireLabel">💰 ПРИБЫЛЬ</div><strong class="empireGreen" id="hudProfit">+12 / мин</strong>
-</div>
-<div id="empireRight" class="empireCard">
- <div class="empireNotice">✦ ДОСТУПНО УЛУЧШЕНИЕ</div>
- <b>Расширение аэропорта</b>
- <span>Новые выходы на посадку и больше рейсов</span>
- <button id="hudBuild" type="button">РАЗВИВАТЬ ↗</button>
- <div class="empireFeatures"><span>☀ День / ночь</span><span>✈ Две ВПП</span><span>◉ 3D-камера</span></div>
-</div>
-<div id="empireUpgrade" class="empireCard">
- <div class="empireUpgradeThumb">🏢</div><div class="empireUpgradeText"><b>УЛУЧШИТЬ ТЕРМИНАЛ</b><span>Увеличь поток пассажиров</span><small>Инвестиции в развитие</small></div>
+<div class="empireUpgradeText"><b>УЛУЧШИТЬ ТЕРМИНАЛ</b><span>Увеличь поток пассажиров</span><small>Инвестиции в развитие</small></div>
  <button id="hudTerminal" type="button">ОТКРЫТЬ</button>
 </div>
 <main><section class="scene"><div class="scenehead"><b>🌍 ТВОЙ АЭРОПОРТ</b><span id="weather">☀ ЯСНО · 22°</span></div><div id="threeWorld" style="width:100%;height:360px;touch-action:none"></div><canvas id="world" width="900" height="570" style="display:none"></canvas><div class="legend"><span><i class="dot" style="background:#51d9b1"></i>Терминал</span><span><i class="dot" style="background:#aab7c8"></i>ВПП</span><span><i class="dot" style="background:#ffc85a"></i>Самолёт</span><span>✦ Объекты оживают со временем</span></div></section>
