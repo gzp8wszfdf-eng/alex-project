@@ -380,6 +380,60 @@ function serviceVan(x,z,color=0xf2bb45,type='cart'){
   const loadRail=new THREE.Mesh(new THREE.BoxGeometry(1.35,.07,1.18),rim);loadRail.position.set(0,1.2,-.48);g.add(loadRail);
   const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.1,.1,.12,10),M(0xffb52e,.2));beacon.position.set(0,1.15,.2);g.add(beacon);
  }
+ // Дополнительная геометрия: кабина, оконные рамки, поручни и маркировка техники.
+ const trim=M(0x263744,.72),chrome=M(0xd7e1e7,.25),rubberLine=M(0x202a31,.9);
+ if(!isBus){
+  // Отдельные боковые стёкла кабины и стойки — тягач больше не выглядит цельным кубом.
+  for(const side of [-1,1]){
+   const sideGlass=new THREE.Mesh(new THREE.BoxGeometry(.035,.36,.68),glass);
+   sideGlass.position.set(side*.758,1.18,.48);g.add(sideGlass);
+   const pillar=new THREE.Mesh(new THREE.BoxGeometry(.055,.43,.055),trim);
+   pillar.position.set(side*.78,1.18,.48);g.add(pillar);
+   const grab=new THREE.Mesh(new THREE.BoxGeometry(.035,.34,.035),chrome);
+   grab.position.set(side*.84,.78,-.82);g.add(grab);
+  }
+  const roofPanel=new THREE.Mesh(new THREE.BoxGeometry(1.42,.075,1.2),M(0xdce5e9,.32));
+  roofPanel.position.set(0,1.43,-.2);g.add(roofPanel);
+  const hood=new THREE.Mesh(new THREE.BoxGeometry(1.28,.13,.48),bodyMat);
+  hood.position.set(0,.91,1.02);g.add(hood);
+  const hoodSeam=new THREE.Mesh(new THREE.BoxGeometry(1.18,.018,.035),trim);
+  hoodSeam.position.set(0,.985,.85);g.add(hoodSeam);
+  const rearReflector=new THREE.Mesh(new THREE.BoxGeometry(.92,.07,.035),M(0xffc34e,.2));
+  rearReflector.position.set(0,.78,-1.29);g.add(rearReflector);
+  const exhaust=new THREE.Mesh(new THREE.CylinderGeometry(.045,.055,.42,8),chrome);
+  exhaust.position.set(-.52,.42,-.88);g.add(exhaust);
+  // Маленькие контрастные полосы безопасности на бортах.
+  for(const side of [-1,1]){
+   const stripe=new THREE.Mesh(new THREE.BoxGeometry(.025,.11,1.65),M(0xf6e7a7,.25));
+   stripe.position.set(side*.833,.48,-.12);g.add(stripe);
+  }
+ }else{
+  // Разделённые секции лобового стекла, зеркала на кронштейнах и двери автобуса.
+  for(const side of [-1,1]){
+   const pillar=new THREE.Mesh(new THREE.BoxGeometry(.07,.58,.07),trim);
+   pillar.position.set(side*1.08,1.35,2.14);g.add(pillar);
+   const mirrorArm=new THREE.Mesh(new THREE.BoxGeometry(.08,.08,.42),chrome);
+   mirrorArm.position.set(side*1.34,1.48,2.0);g.add(mirrorArm);
+   const marker=new THREE.Mesh(new THREE.BoxGeometry(.12,.12,.05),M(0xffc84e,.18));
+   marker.position.set(side*1.255,.62,2.23);g.add(marker);
+  }
+  const roofUnit=new THREE.Mesh(new THREE.BoxGeometry(.72,.12,.62),M(0xe3e8e9,.3));
+  roofUnit.position.set(0,1.68,-.9);g.add(roofUnit);
+  const routeGlow=new THREE.Mesh(new THREE.BoxGeometry(.62,.025,.025),M(0x7ee6ff,.2));
+  routeGlow.position.set(0,1.815,-.9);g.add(routeGlow);
+ }
+ // Контрастные диски колёс, ступицы и болты.
+ wheels.forEach((w)=>{
+  const side=w.position.x<0?-1:1;
+  const hub=new THREE.Mesh(new THREE.CylinderGeometry(isBus?.145:.115,isBus?.145:.115,.19,14),chrome);
+  hub.rotation.z=Math.PI/2;hub.position.copy(w.position);hub.position.x+=side*.035;g.add(hub);
+  const cap=new THREE.Mesh(new THREE.CylinderGeometry(.055,.055,.2,10),trim);
+  cap.rotation.z=Math.PI/2;cap.position.copy(w.position);cap.position.x+=side*.045;g.add(cap);
+ });
+ const antenna=new THREE.Mesh(new THREE.CylinderGeometry(.018,.025,.34,6),dark);
+ antenna.position.set(isBus?.82:.58,isBus?1.82:1.58,-1.35);g.add(antenna);
+ const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.09,.11,.12,10),M(0xffb52e,.22));
+ beacon.position.set(0,isBus?1.82:1.54,-.2);g.add(beacon);
  g.userData.wheels=wheels;g.position.set(x,0,z);world.add(g);serviceVehicles.push(g);return g;
 }
 serviceVan(-34,-20,0xf4c04f,'cart');
