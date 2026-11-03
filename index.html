@@ -331,7 +331,26 @@ renderer.domElement.addEventListener('wheel',e=>{radius=Math.max(27,Math.min(100
 window.addEventListener('airport-aircraft-bought',e=>{const kind=e.detail||'commuter',color=kind==='cargo'?0xf0d9a0:kind==='jet'?0xeaf4ff:0xd9edf5,scale=kind==='cargo'?.61:kind==='jet'?.68:.48;planes.push(plane(-27+(planes.length%5)*12,-5-(planes.length%2)*9,scale,color,kind))});
 window.airportCamera={zoom:d=>{radius=Math.max(27,Math.min(100,radius+d));cam()},rotate:d=>{theta+=d;cam()},reset:()=>{radius=52;theta=.78;phi=1.02;target.set(0,0,0);cam()}};
 document.getElementById('camZoomIn').onclick=()=>window.airportCamera.zoom(-6);document.getElementById('camZoomOut').onclick=()=>window.airportCamera.zoom(6);document.getElementById('camRotate').onclick=()=>window.airportCamera.rotate(Math.PI/4);document.getElementById('camReset').onclick=()=>window.airportCamera.reset();
-const clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();const flightX=-48+(t*2.9%96);planes[0].position.x=flightX;planes[0].position.z=-52;planes[0].position.y=Math.max(0,(flightX-28)*.22);planes[0].rotation.y=Math.PI/2;// Цикл рейса: руление к гейту, стоянка и выезд на рулёжную дорожку.
+const clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();// Прилёт: заход, касание полосы, пробег и руление к стоянке.
+const arrivalCycle=t%72,arrival=planes[0];
+arrival.rotation.z=0;arrival.rotation.y=Math.PI/2;
+if(arrivalCycle<18){
+ const approach=arrivalCycle/18;
+ arrival.visible=true;
+ arrival.position.set(44-80*approach,.15+11*(1-approach),-52);
+}else if(arrivalCycle<28){
+ const roll=arrivalCycle-18;
+ arrival.visible=true;arrival.position.set(-36+2.8*roll,.12,-52);
+}else if(arrivalCycle<40){
+ const taxi=(arrivalCycle-28)/12;
+ arrival.visible=true;
+ arrival.position.set(-8+20*taxi,.12,-52+45*taxi);
+ arrival.rotation.y=Math.PI/2;
+}else if(arrivalCycle<62){
+ arrival.visible=true;arrival.position.set(12,.12,-7);arrival.rotation.y=0;
+}else{
+ arrival.visible=false;
+}// Цикл рейса: руление к гейту, стоянка и выезд на рулёжную дорожку.
 const serviceCycle=(t%72),gateX=-24;
 const departing=planes[1];
 departing.rotation.z=0;
