@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#10243b"><title>Idle Airport Empire</title>
+<style>
+:root{--navy:#10243b;--blue:#2878c7;--sky:#dceefa;--gold:#ffc857;--ink:#183047;--muted:#718397;--green:#35a878}
+*{box-sizing:border-box}body{margin:0;background:#edf3f8;color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,sans-serif;padding-bottom:24px}
+header{background:linear-gradient(135deg,#10243b,#1d527d);color:white;padding:18px 16px 16px;border-radius:0 0 22px 22px}
+.brand{font-weight:850;font-size:21px;letter-spacing:.2px}.sub{opacity:.75;font-size:12px;margin-top:2px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:16px}.stat{background:#ffffff16;border:1px solid #ffffff24;border-radius:13px;padding:10px}.stat small{display:block;color:#d4e5f3;font-size:11px}.stat strong{font-size:20px}
+main{max-width:720px;margin:auto;padding:14px}.panel{background:white;border:1px solid #e1eaf1;border-radius:17px;padding:14px;margin-bottom:13px;box-shadow:0 4px 14px #193b5610}
+.panel h2{font-size:16px;margin:0 0 10px}.airport{height:230px;position:relative;overflow:hidden;border-radius:13px;background:repeating-linear-gradient(0deg,#91bd8a 0 24px,#9fc894 24px 48px)}
+.road{position:absolute;left:0;right:0;bottom:17px;height:27px;background:#687785;border-top:3px solid #dce1e5;border-bottom:3px solid #dce1e5}
+.runway{position:absolute;left:5%;right:5%;top:20px;height:42px;background:#4c5965;border:3px solid #d9e0e4;border-radius:4px}
+.runway:after{content:"";position:absolute;left:8%;right:8%;top:18px;border-top:3px dashed white}
+.terminal{position:absolute;left:9%;top:100px;width:48%;height:76px;background:#e8f4fb;border:3px solid #6d9dbb;border-radius:9px;box-shadow:inset 0 -13px #b6d8e9}
+.terminal:before{content:"✈ TERMINAL";position:absolute;top:8px;left:10px;font-size:11px;font-weight:900;color:#37627f}
+.terminal:after{content:"▥ ▥ ▥ ▥";position:absolute;bottom:12px;left:13px;color:#4383a8;letter-spacing:5px}
+.tower{position:absolute;right:13%;top:91px;width:34px;height:75px;background:#f5f7f8;border:3px solid #6d9dbb;border-radius:8px 8px 3px 3px}
+.tower:before{content:"";position:absolute;top:-12px;left:-5px;width:38px;height:14px;background:#6b9cba;border-radius:5px}
+.plane{position:absolute;left:64%;top:127px;font-size:32px;transform:rotate(-8deg);filter:drop-shadow(1px 2px 1px #3335)}
+.gate{position:absolute;right:10%;bottom:44px;background:#fff;border:1px solid #8aa8b9;border-radius:8px;padding:5px 8px;font-size:10px;font-weight:700}
+.level{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:8px}
+.progress{height:8px;background:#e9eff4;border-radius:10px;overflow:hidden;margin-top:6px}.progress i{display:block;height:100%;background:linear-gradient(90deg,#38a4db,#35a878);width:0%}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.upgrade{border:1px solid #dce7ef;border-radius:13px;padding:11px;background:#fbfdff;min-width:0}.upgrade .emoji{font-size:23px}.upgrade b{display:block;font-size:13px;margin:3px 0}.upgrade p{font-size:11px;color:var(--muted);margin:0 0 8px;min-height:30px}
+button{font:inherit;cursor:pointer;border:0;border-radius:10px;padding:10px 12px;background:var(--blue);color:white;font-weight:750;width:100%;font-size:12px}button:disabled{opacity:.42;cursor:not-allowed}.gold{background:#f3b83f;color:#382807}.green{background:var(--green)}.muted{font-size:11px;color:var(--muted);line-height:1.45}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.row button{width:auto;white-space:nowrap}
+.flight{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid #edf1f5}.flight:first-of-type{border-top:0}.flight span:first-child{font-size:24px}.flight b{font-size:12px}.flight small{display:block;color:var(--muted);font-size:10px}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#10243b;color:white;padding:10px 16px;border-radius:20px;font-size:12px;opacity:0;pointer-events:none;transition:.2s}.toast.show{opacity:1}
+@media(min-width:560px){.grid{grid-template-columns:repeat(4,1fr)}.airport{height:270px}.terminal{width:40%;left:17%}}
+</style>
+</head>
+<body>
+<header><div class="brand">✈ Idle Airport Empire</div><div class="sub">Построй аэропорт мечты — рейс за рейсом</div>
+<div class="stats"><div class="stat"><small>💰 Баланс</small><strong id="money">500</strong></div><div class="stat"><small>📈 Доход в минуту</small><strong id="income">12</strong></div></div></header>
+<main>
+<section class="panel"><div class="row"><h2>Твой аэропорт</h2><span id="levelTag" class="muted">Уровень 1</span></div>
+<div class="airport"><div class="runway"></div><div class="terminal"></div><div class="tower"></div><div class="plane">✈️</div><div class="gate">ВЫХОД A1</div><div class="road"></div></div>
+<div class="level"><span>Развитие аэропорта</span><b id="progressText">0 / 100 XP</b></div><div class="progress"><i id="progress"></i></div></section>
+<section class="panel"><h2>🛫 Управление рейсами</h2><div class="flight"><span>🛩️</span><div style="flex:1"><b>Региональный рейс</b><small id="flightState">Самолёт готов к вылету</small></div><button id="dispatch">Отправить · +35 💰</button></div><div class="muted">Отправляй рейсы вручную и получай дополнительную прибыль.</div></section>
+<section class="panel"><h2>🏗️ Улучшения аэропорта</h2><div class="grid" id="upgrades"></div></section>
+<section class="panel"><h2>🎁 Ежедневный бонус</h2><div class="row"><div><b>Бонус владельца</b><div class="muted">Забери небольшую награду.</div></div><button class="gold" id="daily">Забрать +100</button></div><p class="muted" style="margin-bottom:0">Рекламная кнопка пока демонстрационная. Для настоящих оплачиваемых просмотров позже подключим рекламную сеть.</p></section>
+<section class="panel"><div class="row"><h2>👷 Персонал</h2><b id="staff">2 сотрудника</b></div><div class="muted">Сотрудники помогают обслуживать пассажиров и увеличивают доход.</div></section>
+<div class="muted" style="text-align:center;padding:5px">Прототип 0.1 · Прогресс сохраняется на этом устройстве</div>
+</main><div class="toast" id="toast"></div>
+<script>
+const defaults={money:500,level:1,xp:0,terminal:1,runway:1,staff:2,service:1,last:Date.now(),daily:0,flights:0};
+let s={...defaults,...JSON.parse(localStorage.getItem('airportEmpireSave')||'{}')};
+const defs=[
+{id:'terminal',name:'Терминал',emoji:'🏢',desc:'Больше пассажиров и дохода.',base:120,rate:7},
+{id:'runway',name:'Взлётная полоса',emoji:'🛫',desc:'Принимай больше самолётов.',base:160,rate:9},
+{id:'staff',name:'Нанять персонал',emoji:'👷',desc:'Команда обслуживает рейсы.',base:90,rate:5},
+{id:'service',name:'Сервис пассажиров',emoji:'🧳',desc:'Улучши комфорт и прибыль.',base:140,rate:8}
+];
+function cost(d){return Math.floor(d.base*Math.pow(1.62,s[d.id]-1))}
+function income(){return 12+(s.terminal-1)*7+(s.runway-1)*9+(s.staff-2)*5+(s.service-1)*8}
+function fmt(n){return Math.floor(n).toLocaleString('ru-RU')}
+function save(){s.last=Date.now();localStorage.setItem('airportEmpireSave',JSON.stringify(s))}
+function toast(t){let e=document.getElementById('toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1800)}
+function render(){
+document.getElementById('money').textContent=fmt(s.money);document.getElementById('income').textContent=fmt(income());
+document.getElementById('levelTag').textContent='Уровень '+s.level;document.getElementById('progressText').textContent=s.xp+' / '+(s.level*100)+' XP';
+document.getElementById('progress').style.width=Math.min(100,s.xp/(s.level*100)*100)+'%';
+document.getElementById('staff').textContent=s.staff+' сотрудника';
+document.getElementById('upgrades').innerHTML=defs.map(d=>{let c=cost(d);return '<div class="upgrade"><div class="emoji">'+d.emoji+'</div><b>'+d.name+' · ур. '+s[d.id]+'</b><p>'+d.desc+'<br>+'+d.rate+' 💰/мин за уровень</p><button '+(s.money<c?'disabled':'')+' data-buy="'+d.id+'">Улучшить · '+fmt(c)+' 💰</button></div>'}).join('');
+document.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>buy(b.dataset.buy));
+document.getElementById('daily').disabled=Date.now()-s.daily<86400000;
+}
+function buy(id){let d=defs.find(x=>x.id===id),c=cost(d);if(s.money<c)return;s.money-=c;s[id]++;s.xp+=25;if(s.xp>=s.level*100){s.xp-=s.level*100;s.level++;toast('Новый уровень аэропорта! ✨')}else toast(d.name+' улучшен!');save();render()}
+document.getElementById('dispatch').onclick=()=>{let reward=35+(s.terminal-1)*8+(s.service-1)*4;s.money+=reward;s.xp+=8;s.flights++;document.getElementById('flightState').textContent='Выполнено рейсов: '+s.flights;toast('Рейс выполнен: +'+reward+' 💰');if(s.xp>=s.level*100){s.xp-=s.level*100;s.level++}save();render()};
+document.getElementById('daily').onclick=()=>{if(Date.now()-s.daily<86400000)return;s.money+=100;s.daily=Date.now();toast('Бонус получен! +100 💰');save();render()};
+let elapsed=Math.max(0,Math.min(8*3600,(Date.now()-s.last)/1000));s.money+=income()*elapsed/60;
+setInterval(()=>{s.money+=income()/60;save();render()},1000);
+render();save();
+</script></body></html>
