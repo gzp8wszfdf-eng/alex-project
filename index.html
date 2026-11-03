@@ -214,6 +214,21 @@ for(let x=-36;x<38;x+=5)slab(x,-9,.22,.42,white,.2);
 for(let z=-17;z<1;z+=4)slab(-37,z,.7,.7,yellow,.22);
 slab(-2,9,54,31,concrete);
 for(let x=-28;x<25;x+=5)slab(x,-1,.18,9,white,.22);
+// Расширенный перрон авиапарка: все видимые места находятся внутри ограждения.
+slab(0,72,138,92,concrete);
+slab(0,72,132,86,road,.12);
+for(let row=0;row<4;row++){
+ const z=34+row*23;
+ for(let col=0;col<6;col++){
+  const x=-55+col*22;
+  slab(x,z,18,.22,yellow,.2);
+  slab(x-9,z+1,.22,14,yellow,.2);
+  slab(x+9,z+1,.22,14,yellow,.2);
+  const stand=new THREE.Mesh(new THREE.BoxGeometry(1.1,.035,1.1),white);
+  stand.position.set(x,.22,z+7);world.add(stand);
+ }
+}
+slab(0,23,132,5,road,.14);slab(0,118,138,4,road,.14);
 // Огни кромки ВПП и рулёжных дорожек с мягким свечением.
 const runwayGlow=M(0xd8f3ff,.25);runwayGlow.emissive=new THREE.Color(0x9bcfff);runwayGlow.emissiveIntensity=.48;
 const taxiGlow=M(0xffd58a,.25);taxiGlow.emissive=new THREE.Color(0xffb34d);taxiGlow.emissiveIntensity=.32;
@@ -769,9 +784,27 @@ function plane(x,z,scale=1,color=0xf2f4f5,model='jet'){
  g.position.set(x,0,z);g.scale.setScalar(scale);world.add(g);return g
 }
 const planes=[plane(-24,-7,.78,0xf4f6fa,'commuter'),plane(12,-7,.72,lv.fleet>=2?0xd9e9f4:0xf4f6fa,'jet'),...Array.from({length:Math.min(5,lv.fleet-1)},(_,i)=>plane(-28+i*13,17,.48,i%2?0xf0d9a0:0xe8f1fa,'commuter'))];
-// Отдельная стоянка авиапарка на западном перроне: самолёты не попадают в город и не накладываются друг на друга.
-const fleetParking=[[-55,36],[-32,36],[-9,36],[-55,58],[-32,58],[-9,58],[-55,80],[-32,80],[-9,80],[-55,102],[-32,102],[-9,102]];
-[['turboprop',0xeee8d5,.58],['cargo',0xf0d9a0,.61],['narrow',0xeaf4ff,.68],['wide',0xdceaf4,.72],['jumbo',0xf4f6fa,.78],['supersonic',0xe8f0ff,.7],['mega',0xe4edf4,.8],['luxury',0xc9d8e8,.58],['ultra',0xf0f4ff,.82],['hypersonic',0xb8d7ef,.75],['orbital',0xc7d5e8,.88]].forEach(([model,color,scale],i)=>{if((lv.aircraft[model]||0)>0){const [x,z]=fleetParking[i];planes.push(plane(x,z,scale,color,model))}});
+// Стоянка авиапарка: 24 размеченных места на расширенном перроне.
+const fleetDisplay=new THREE.Group();world.add(fleetDisplay);
+const fleetModels=[
+ ['commuter',0xf4f6fa,.58],['jet',0xd9e9f4,.62],['turboprop',0xeee8d5,.58],
+ ['cargo',0xf0d9a0,.61],['narrow',0xeaf4ff,.68],['wide',0xdceaf4,.72],
+ ['jumbo',0xf4f6fa,.78],['supersonic',0xe8f0ff,.7],['mega',0xe4edf4,.8],
+ ['luxury',0xc9d8e8,.58],['ultra',0xf0f4ff,.82],['hypersonic',0xb8d7ef,.75],
+ ['orbital',0xc7d5e8,.88]
+];
+const fleetSlots=Array.from({length:24},(_,i)=>[-55+(i%6)*22,34+Math.floor(i/6)*23]);
+function rebuildFleetDisplay(){
+ while(fleetDisplay.children.length){const g=fleetDisplay.children.pop();g.traverse(o=>{if(o.geometry)o.geometry.dispose()})}
+ const owned=[];
+ for(const [model,color,scale] of fleetModels)for(let n=0;n<Math.max(0,lv.aircraft[model]||0);n++)owned.push({model,color,scale});
+ owned.slice(0,fleetSlots.length).forEach((a,i)=>{
+  const [x,z]=fleetSlots[i],g=plane(x,z,a.scale,a.color,a.model);
+  world.remove(g);fleetDisplay.add(g);
+ });
+}
+rebuildFleetDisplay();
+window.addEventListener('airport-aircraft-bought',rebuildFleetDisplay);
 planes[1].rotation.y=Math.PI;rebuildPurchasedRunways();window.addEventListener('airport-runways-updated',rebuildPurchasedRunways);
 const runwayLength=54+Math.min(8,lv.runway-1)*5;
 const extraRunway=lv.runway>1?slab(0,-44,runwayLength,5,road):null;
