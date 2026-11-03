@@ -150,9 +150,10 @@ const clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);
 <script>
 (()=>{
  const panels=[...document.querySelectorAll('main>.panel')];
- const labels=[['✈️','Рейсы'],['🏗️','Здания'],['👥','Персонал'],['📈','Развитие']];
+ const labels=[['✈️','Рейсы'],['🏗️','Здания'],['👥','Задания'],['📈','Развитие']];
  const dock=document.createElement('nav');dock.id='gameDock';
- labels.forEach(([ico,label],i)=>{const b=document.createElement('button');b.className='dockBtn';b.innerHTML='<span>'+ico+'</span>'+label;b.addEventListener('click',()=>{const target=i===0?panels[0]:i===1?panels[1]:i===2?panels[1]:panels[2];const was=target.classList.contains('active');panels.forEach(p=>p.classList.remove('active'));dock.querySelectorAll('button').forEach(x=>x.classList.remove('active'));if(!was){target.classList.add('active');b.classList.add('active')}});dock.appendChild(b)});
+ const sectionFor=[0,1,2,3];
+ labels.forEach(([ico,label],i)=>{const b=document.createElement('button');b.className='dockBtn';b.innerHTML='<span>'+ico+'</span>'+label;b.addEventListener('click',()=>{const target=panels[sectionFor[i]];const was=target.classList.contains('active');panels.forEach(p=>p.classList.remove('active'));dock.querySelectorAll('button').forEach(x=>x.classList.remove('active'));if(!was){target.classList.add('active');b.classList.add('active')}});dock.appendChild(b)});
  document.body.appendChild(dock);
  const close=document.createElement('button');close.id='closeSheet';close.textContent='×';close.onclick=()=>{panels.forEach(p=>p.classList.remove('active'));dock.querySelectorAll('button').forEach(x=>x.classList.remove('active'))};document.body.appendChild(close);
  const observer=new MutationObserver(()=>{close.style.display=panels.some(p=>p.classList.contains('active'))?'block':'none'});panels.forEach(p=>observer.observe(p,{attributes:true,attributeFilter:['class']}));
