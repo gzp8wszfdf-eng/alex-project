@@ -1,76 +1,63 @@
 <!doctype html>
-<html lang="ru">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#10243b"><title>Idle Airport Empire</title>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#101c30"><title>Idle Airport Empire</title>
 <style>
-:root{--navy:#10243b;--blue:#2878c7;--sky:#dceefa;--gold:#ffc857;--ink:#183047;--muted:#718397;--green:#35a878}
-*{box-sizing:border-box}body{margin:0;background:#edf3f8;color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,sans-serif;padding-bottom:24px}
-header{background:linear-gradient(135deg,#10243b,#1d527d);color:white;padding:18px 16px 16px;border-radius:0 0 22px 22px}
-.brand{font-weight:850;font-size:21px;letter-spacing:.2px}.sub{opacity:.75;font-size:12px;margin-top:2px}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:16px}.stat{background:#ffffff16;border:1px solid #ffffff24;border-radius:13px;padding:10px}.stat small{display:block;color:#d4e5f3;font-size:11px}.stat strong{font-size:20px}
-main{max-width:720px;margin:auto;padding:14px}.panel{background:white;border:1px solid #e1eaf1;border-radius:17px;padding:14px;margin-bottom:13px;box-shadow:0 4px 14px #193b5610}
-.panel h2{font-size:16px;margin:0 0 10px}.airport{height:230px;position:relative;overflow:hidden;border-radius:13px;background:repeating-linear-gradient(0deg,#91bd8a 0 24px,#9fc894 24px 48px)}
-.road{position:absolute;left:0;right:0;bottom:17px;height:27px;background:#687785;border-top:3px solid #dce1e5;border-bottom:3px solid #dce1e5}
-.runway{position:absolute;left:5%;right:5%;top:20px;height:42px;background:#4c5965;border:3px solid #d9e0e4;border-radius:4px}
-.runway:after{content:"";position:absolute;left:8%;right:8%;top:18px;border-top:3px dashed white}
-.terminal{position:absolute;left:9%;top:100px;width:48%;height:76px;background:#e8f4fb;border:3px solid #6d9dbb;border-radius:9px;box-shadow:inset 0 -13px #b6d8e9}
-.terminal:before{content:"✈ TERMINAL";position:absolute;top:8px;left:10px;font-size:11px;font-weight:900;color:#37627f}
-.terminal:after{content:"▥ ▥ ▥ ▥";position:absolute;bottom:12px;left:13px;color:#4383a8;letter-spacing:5px}
-.tower{position:absolute;right:13%;top:91px;width:34px;height:75px;background:#f5f7f8;border:3px solid #6d9dbb;border-radius:8px 8px 3px 3px}
-.tower:before{content:"";position:absolute;top:-12px;left:-5px;width:38px;height:14px;background:#6b9cba;border-radius:5px}
-.plane{position:absolute;left:64%;top:127px;font-size:32px;transform:rotate(-8deg);filter:drop-shadow(1px 2px 1px #3335)}
-.gate{position:absolute;right:10%;bottom:44px;background:#fff;border:1px solid #8aa8b9;border-radius:8px;padding:5px 8px;font-size:10px;font-weight:700}
-.level{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:8px}
-.progress{height:8px;background:#e9eff4;border-radius:10px;overflow:hidden;margin-top:6px}.progress i{display:block;height:100%;background:linear-gradient(90deg,#38a4db,#35a878);width:0%}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.upgrade{border:1px solid #dce7ef;border-radius:13px;padding:11px;background:#fbfdff;min-width:0}.upgrade .emoji{font-size:23px}.upgrade b{display:block;font-size:13px;margin:3px 0}.upgrade p{font-size:11px;color:var(--muted);margin:0 0 8px;min-height:30px}
-button{font:inherit;cursor:pointer;border:0;border-radius:10px;padding:10px 12px;background:var(--blue);color:white;font-weight:750;width:100%;font-size:12px}button:disabled{opacity:.42;cursor:not-allowed}.gold{background:#f3b83f;color:#382807}.green{background:var(--green)}.muted{font-size:11px;color:var(--muted);line-height:1.45}
-.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.row button{width:auto;white-space:nowrap}
-.flight{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid #edf1f5}.flight:first-of-type{border-top:0}.flight span:first-child{font-size:24px}.flight b{font-size:12px}.flight small{display:block;color:var(--muted);font-size:10px}
-.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#10243b;color:white;padding:10px 16px;border-radius:20px;font-size:12px;opacity:0;pointer-events:none;transition:.2s}.toast.show{opacity:1}
-@media(min-width:560px){.grid{grid-template-columns:repeat(4,1fr)}.airport{height:270px}.terminal{width:40%;left:17%}}
-</style>
-</head>
-<body>
-<header><div class="brand">✈ Idle Airport Empire</div><div class="sub">Построй аэропорт мечты — рейс за рейсом</div>
-<div class="stats"><div class="stat"><small>💰 Баланс</small><strong id="money">500</strong></div><div class="stat"><small>📈 Доход в минуту</small><strong id="income">12</strong></div></div></header>
-<main>
-<section class="panel"><div class="row"><h2>Твой аэропорт</h2><span id="levelTag" class="muted">Уровень 1</span></div>
-<div class="airport"><div class="runway"></div><div class="terminal"></div><div class="tower"></div><div class="plane">✈️</div><div class="gate">ВЫХОД A1</div><div class="road"></div></div>
-<div class="level"><span>Развитие аэропорта</span><b id="progressText">0 / 100 XP</b></div><div class="progress"><i id="progress"></i></div></section>
-<section class="panel"><h2>🛫 Управление рейсами</h2><div class="flight"><span>🛩️</span><div style="flex:1"><b>Региональный рейс</b><small id="flightState">Самолёт готов к вылету</small></div><button id="dispatch">Отправить · +35 💰</button></div><div class="muted">Отправляй рейсы вручную и получай дополнительную прибыль.</div></section>
-<section class="panel"><h2>🏗️ Улучшения аэропорта</h2><div class="grid" id="upgrades"></div></section>
-<section class="panel"><h2>🎁 Ежедневный бонус</h2><div class="row"><div><b>Бонус владельца</b><div class="muted">Забери небольшую награду.</div></div><button class="gold" id="daily">Забрать +100</button></div><p class="muted" style="margin-bottom:0">Рекламная кнопка пока демонстрационная. Для настоящих оплачиваемых просмотров позже подключим рекламную сеть.</p></section>
-<section class="panel"><div class="row"><h2>👷 Персонал</h2><b id="staff">2 сотрудника</b></div><div class="muted">Сотрудники помогают обслуживать пассажиров и увеличивают доход.</div></section>
-<div class="muted" style="text-align:center;padding:5px">Прототип 0.1 · Прогресс сохраняется на этом устройстве</div>
-</main><div class="toast" id="toast"></div>
+:root{--bg:#0c1525;--panel:#17253a;--panel2:#20334d;--gold:#ffc85a;--mint:#54d6ad;--text:#f4f7fc;--muted:#9aabc1}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,sans-serif;padding-bottom:30px}header{padding:17px 16px 14px;background:linear-gradient(135deg,#142b47,#263d5b);border-bottom:1px solid #ffffff18;position:sticky;top:0;z-index:5}.top{display:flex;justify-content:space-between;align-items:center}.logo{font-weight:900;font-size:18px;letter-spacing:.2px}.tag{font-size:10px;color:#a9c6e7;background:#ffffff12;padding:6px 9px;border-radius:20px}.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:13px}.stat{background:#ffffff0d;border:1px solid #ffffff12;border-radius:12px;padding:9px}.stat small{display:block;color:#aabbd0;font-size:10px}.stat b{font-size:17px}.stat b.gold{color:var(--gold)}main{max-width:760px;margin:auto;padding:12px}.scene{background:#162b3c;border:1px solid #2d4960;border-radius:18px;overflow:hidden;box-shadow:0 12px 35px #0005}.scenehead{display:flex;justify-content:space-between;padding:13px 14px 4px;align-items:center}.scenehead b{font-size:14px}.scenehead span{font-size:10px;color:#a9c1d5}canvas{display:block;width:100%;height:auto;touch-action:pan-y}.legend{display:flex;gap:12px;flex-wrap:wrap;padding:9px 14px 13px;color:#a9bbca;font-size:10px}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px}.xp{padding:12px 2px 14px}.xphead{display:flex;justify-content:space-between;color:var(--muted);font-size:11px}.bar{height:7px;background:#26374c;border-radius:8px;margin-top:7px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#42b6ec,#59dfad);width:0%}.panel{background:var(--panel);border:1px solid #ffffff10;border-radius:16px;padding:14px;margin-top:12px}.panel h2{font-size:14px;margin:0 0 12px}.row{display:flex;justify-content:space-between;align-items:center;gap:10px}.muted{color:var(--muted);font-size:11px;line-height:1.45}.btn{border:0;border-radius:11px;background:linear-gradient(135deg,#2689d7,#2464a9);color:white;font-weight:800;font-size:12px;padding:11px 13px;cursor:pointer}.btn:disabled{opacity:.35}.btn.gold{background:linear-gradient(135deg,#ffd36e,#eaa52e);color:#392607}.btn.green{background:linear-gradient(135deg,#41c89a,#239a77)}.flight{display:flex;align-items:center;gap:11px;padding:10px 0;border-top:1px solid #ffffff10}.flight:first-of-type{border-top:0}.planeicon{font-size:26px;background:#ffffff0c;border-radius:11px;padding:8px}.flightinfo{flex:1;min-width:0}.flightinfo b{font-size:12px;display:block}.flightinfo small{font-size:10px;color:var(--muted)}.upgradegrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.upgrade{background:var(--panel2);border:1px solid #ffffff0d;border-radius:13px;padding:11px}.upgrade .emoji{font-size:22px}.upgrade b{display:block;font-size:12px;margin:4px 0}.upgrade p{font-size:10px;color:var(--muted);min-height:27px;margin:0 0 9px}.upgrade .btn{width:100%;padding:9px 5px;font-size:10px}.task{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-top:1px solid #ffffff10;font-size:11px}.toast{position:fixed;z-index:9;bottom:18px;left:50%;transform:translateX(-50%);background:#f3c45b;color:#30220a;padding:11px 16px;border-radius:22px;font-size:12px;font-weight:800;opacity:0;transition:.2s;pointer-events:none}.toast.show{opacity:1}@media(min-width:560px){main{padding:18px}.upgradegrid{grid-template-columns:repeat(4,1fr)}header{padding-left:max(16px,calc((100% - 724px)/2));padding-right:max(16px,calc((100% - 724px)/2))}}
+</style></head><body>
+<header><div class="top"><div><div class="logo">✈ IDLE AIRPORT EMPIRE</div><div class="muted">Построй аэропорт мирового уровня</div></div><span class="tag" id="levelTag">УРОВЕНЬ 1</span></div><div class="stats"><div class="stat"><small>💰 Деньги</small><b class="gold" id="money">500</b></div><div class="stat"><small>📈 Доход / мин</small><b id="income">12</b></div><div class="stat"><small>🧍 Пассажиры</small><b id="pax">24</b></div></div></header>
+<main><section class="scene"><div class="scenehead"><b>🌍 ТВОЙ АЭРОПОРТ</b><span id="weather">☀ ЯСНО · 22°</span></div><canvas id="world" width="900" height="570"></canvas><div class="legend"><span><i class="dot" style="background:#51d9b1"></i>Терминал</span><span><i class="dot" style="background:#aab7c8"></i>ВПП</span><span><i class="dot" style="background:#ffc85a"></i>Самолёт</span><span>✦ Объекты оживают со временем</span></div></section>
+<div class="xp"><div class="xphead"><span>РЕПУТАЦИЯ АЭРОПОРТА</span><b id="xptext">0 / 100 XP</b></div><div class="bar"><i id="xpbar"></i></div></div>
+<section class="panel"><div class="row"><h2>🛫 РЕЙСЫ И АВИАКОМПАНИИ</h2><span class="muted" id="flightCount">0 рейсов</span></div><div class="flight"><div class="planeicon">🛩️</div><div class="flightinfo"><b>Региональный рейс · A-101</b><small id="flightState">Самолёт готов к посадке</small></div><button class="btn green" id="dispatch">Обслужить · +35</button></div><div class="muted">Обслуживай рейсы, зарабатывай и открывай новые возможности.</div></section>
+<section class="panel"><h2>🏗️ РАЗВИТИЕ ИНФРАСТРУКТУРЫ</h2><div class="upgradegrid" id="upgrades"></div></section>
+<section class="panel"><div class="row"><h2>📋 ЗАДАНИЯ ДИРЕКТОРА</h2><span class="tag">НАГРАДЫ</span></div><div class="task"><span>🛫 Обслужить 5 рейсов</span><b id="taskFlights">0 / 5</b></div><div class="task"><span>🏢 Улучшить терминал до 3 уровня</span><b id="taskTerminal">1 / 3</b></div><div class="task"><span>💰 Получить 1 000 монет</span><b id="taskMoney">0 / 1 000</b></div></section>
+<section class="panel"><div class="row"><div><h2>🎁 ЕЖЕДНЕВНАЯ НАГРАДА</h2><div class="muted">Бонус директора аэропорта</div></div><button class="btn gold" id="daily">Забрать +100</button></div><p class="muted">Это внутриигровой бонус. Настоящую видеорекламу подключим отдельно.</p></section>
+<div class="muted" style="text-align:center;padding:15px">IDLE AIRPORT EMPIRE · EARLY ACCESS 0.2</div></main><div class="toast" id="toast"></div>
 <script>
-const defaults={money:500,level:1,xp:0,terminal:1,runway:1,staff:2,service:1,last:Date.now(),daily:0,flights:0};
-let s={...defaults,...JSON.parse(localStorage.getItem('airportEmpireSave')||'{}')};
-const defs=[
-{id:'terminal',name:'Терминал',emoji:'🏢',desc:'Больше пассажиров и дохода.',base:120,rate:7},
-{id:'runway',name:'Взлётная полоса',emoji:'🛫',desc:'Принимай больше самолётов.',base:160,rate:9},
-{id:'staff',name:'Нанять персонал',emoji:'👷',desc:'Команда обслуживает рейсы.',base:90,rate:5},
-{id:'service',name:'Сервис пассажиров',emoji:'🧳',desc:'Улучши комфорт и прибыль.',base:140,rate:8}
-];
+const old=JSON.parse(localStorage.getItem('airportEmpireSave')||'{}');
+const defaults={money:500,level:1,xp:0,terminal:1,runway:1,staff:2,service:1,last:Date.now(),daily:0,flights:0,earned:0};
+let s={...defaults,...old};s.earned=s.earned||s.money||500;
+const defs=[{id:'terminal',name:'Терминал',emoji:'🏢',desc:'Больше стоек и пассажиров',base:120,rate:7},{id:'runway',name:'Взлётная полоса',emoji:'🛫',desc:'Принимай крупные самолёты',base:160,rate:9},{id:'staff',name:'Персонал',emoji:'👨‍✈️',desc:'Быстрее обслуживание рейсов',base:90,rate:5},{id:'service',name:'Сервис',emoji:'🧳',desc:'Магазины, кафе и комфорт',base:140,rate:8}];
+const $=id=>document.getElementById(id),fmt=n=>Math.floor(n).toLocaleString('ru-RU');
 function cost(d){return Math.floor(d.base*Math.pow(1.62,s[d.id]-1))}
 function income(){return 12+(s.terminal-1)*7+(s.runway-1)*9+(s.staff-2)*5+(s.service-1)*8}
-function fmt(n){return Math.floor(n).toLocaleString('ru-RU')}
 function save(){s.last=Date.now();localStorage.setItem('airportEmpireSave',JSON.stringify(s))}
-function toast(t){let e=document.getElementById('toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1800)}
-function render(){
-document.getElementById('money').textContent=fmt(s.money);document.getElementById('income').textContent=fmt(income());
-document.getElementById('levelTag').textContent='Уровень '+s.level;document.getElementById('progressText').textContent=s.xp+' / '+(s.level*100)+' XP';
-document.getElementById('progress').style.width=Math.min(100,s.xp/(s.level*100)*100)+'%';
-document.getElementById('staff').textContent=s.staff+' сотрудника';
-document.getElementById('upgrades').innerHTML=defs.map(d=>{let c=cost(d);return '<div class="upgrade"><div class="emoji">'+d.emoji+'</div><b>'+d.name+' · ур. '+s[d.id]+'</b><p>'+d.desc+'<br>+'+d.rate+' 💰/мин за уровень</p><button '+(s.money<c?'disabled':'')+' data-buy="'+d.id+'">Улучшить · '+fmt(c)+' 💰</button></div>'}).join('');
-document.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>buy(b.dataset.buy));
-document.getElementById('daily').disabled=Date.now()-s.daily<86400000;
-}
-function buy(id){let d=defs.find(x=>x.id===id),c=cost(d);if(s.money<c)return;s.money-=c;s[id]++;s.xp+=25;if(s.xp>=s.level*100){s.xp-=s.level*100;s.level++;toast('Новый уровень аэропорта! ✨')}else toast(d.name+' улучшен!');save();render()}
-document.getElementById('dispatch').onclick=()=>{let reward=35+(s.terminal-1)*8+(s.service-1)*4;s.money+=reward;s.xp+=8;s.flights++;document.getElementById('flightState').textContent='Выполнено рейсов: '+s.flights;toast('Рейс выполнен: +'+reward+' 💰');if(s.xp>=s.level*100){s.xp-=s.level*100;s.level++}save();render()};
-document.getElementById('daily').onclick=()=>{if(Date.now()-s.daily<86400000)return;s.money+=100;s.daily=Date.now();toast('Бонус получен! +100 💰');save();render()};
-let elapsed=Math.max(0,Math.min(8*3600,(Date.now()-s.last)/1000));s.money+=income()*elapsed/60;
-setInterval(()=>{s.money+=income()/60;save();render()},1000);
-render();save();
+function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),1700)}
+function render(){$('money').textContent=fmt(s.money);$('income').textContent=fmt(income());$('pax').textContent=fmt(24+(s.terminal-1)*18+(s.staff-2)*7);$('levelTag').textContent='УРОВЕНЬ '+s.level;$('xptext').textContent=s.xp+' / '+s.level*100+' XP';$('xpbar').style.width=Math.min(100,s.xp/(s.level*100)*100)+'%';$('flightCount').textContent=s.flights+' рейсов';$('taskFlights').textContent=Math.min(5,s.flights)+' / 5';$('taskTerminal').textContent=Math.min(3,s.terminal)+' / 3';$('taskMoney').textContent=fmt(Math.min(1000,s.earned))+' / 1 000';$('daily').disabled=Date.now()-s.daily<86400000;
+$('upgrades').innerHTML=defs.map(d=>'<div class="upgrade"><div class="emoji">'+d.emoji+'</div><b>'+d.name+' · '+s[d.id]+'</b><p>'+d.desc+'<br>+'+d.rate+' монет/мин</p><button class="btn" '+(s.money<cost(d)?'disabled':'')+' data-buy="'+d.id+'">Улучшить · '+fmt(cost(d))+' 💰</button></div>').join('');document.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>buy(b.dataset.buy))}
+function addXP(n){s.xp+=n;while(s.xp>=s.level*100){s.xp-=s.level*100;s.level++;toast('Новый уровень! Аэропорт растёт ⭐')}}
+function buy(id){let d=defs.find(x=>x.id===id),c=cost(d);if(s.money<c)return;s.money-=c;s[id]++;addXP(25);save();render();toast(d.name+' улучшен!')}
+$('dispatch').onclick=()=>{let reward=35+(s.terminal-1)*8+(s.service-1)*4;s.money+=reward;s.earned+=reward;s.flights++;addXP(8);$('flightState').textContent='Рейс A-101 обслужен · следующий через минуту';save();render();toast('Рейс обслужен: +'+reward+' 💰')};
+$('daily').onclick=()=>{if(Date.now()-s.daily<86400000)return;s.money+=100;s.earned+=100;s.daily=Date.now();save();render();toast('Бонус директора +100 💰')};
+let elapsed=Math.max(0,Math.min(28800,(Date.now()-s.last)/1000));s.money+=income()*elapsed/60;
+setInterval(()=>{s.money+=income()/60;s.earned+=income()/60;save();render()},1000);render();save();
+// Isometric airport world
+const cv=$('world'),ctx=cv.getContext('2d');let tick=0;
+function poly(points,fill,stroke){ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.stroke()}}
+function iso(x,y,z=0){return [450+(x-y)*.72,290+(x+y)*.36-z]}
+function block(x,y,w,d,h,top,side1,side2){let a=iso(x,y),b=iso(x+w,y),c=iso(x+w,y+d),e=iso(x,y+d);let at=iso(x,y,h),bt=iso(x+w,y,h),ct=iso(x+w,y+d,h),et=iso(x,y+d,h);poly([e,c,ct,et],side1);poly([b,c,ct,bt],side2);poly([at,bt,ct,et],top,'#ffffff30')}
+function line(x1,y1,x2,y2,color,width=2){let a=iso(x1,y1,1),b=iso(x2,y2,1);ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...b);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke()}
+function plane(x,y,scale=1,angle=0){let p=iso(x,y,19);ctx.save();ctx.translate(p[0],p[1]);ctx.rotate(angle);ctx.scale(scale,scale);ctx.fillStyle='#e8f2fa';ctx.strokeStyle='#506b82';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(0,-25);ctx.lineTo(5,-4);ctx.lineTo(22,7);ctx.lineTo(21,12);ctx.lineTo(5,8);ctx.lineTo(4,23);ctx.lineTo(10,28);ctx.lineTo(9,31);ctx.lineTo(0,29);ctx.lineTo(-9,31);ctx.lineTo(-10,28);ctx.lineTo(-4,23);ctx.lineTo(-5,8);ctx.lineTo(-21,12);ctx.lineTo(-22,7);ctx.lineTo(-5,-4);ctx.closePath();ctx.fill();ctx.stroke();ctx.fillStyle='#4b91bc';ctx.fillRect(-3,-14,6,18);ctx.restore()}
+function tree(x,y){let p=iso(x,y,0);ctx.fillStyle='#79553a';ctx.fillRect(p[0]-2,p[1]-10,4,13);ctx.fillStyle='#3b9b70';ctx.beginPath();ctx.arc(p[0],p[1]-15,10,0,7);ctx.fill();ctx.fillStyle='#63bd82';ctx.beginPath();ctx.arc(p[0]-4,p[1]-19,5,0,7);ctx.fill()}
+function draw(){tick+=.016;ctx.clearRect(0,0,900,570);let grad=ctx.createLinearGradient(0,0,0,570);grad.addColorStop(0,'#9bc8dc');grad.addColorStop(.55,'#b8d9c4');grad.addColorStop(1,'#659c7b');ctx.fillStyle=grad;ctx.fillRect(0,0,900,570);
+poly([iso(-420,-220),iso(420,-220),iso(420,220),iso(-420,220)],'#6ca477');for(let i=-360;i<400;i+=42){line(i,-220,i,220,'#ffffff0b',1);line(-420,i,420,i,'#ffffff0b',1)}
+// taxiways and runway
+poly([iso(-330,-175),iso(330,-175),iso(330,-92),iso(-330,-92)],'#4b5965','#a8b6bf');for(let i=-300;i<300;i+=48)line(i,-133,i+24,-133,'#e8edf0',3);
+poly([iso(-270,-65),iso(275,-65),iso(275,5),iso(-270,5)],'#b8c4c8','#e5e9e9');poly([iso(-260,-57),iso(265,-57),iso(265,-3),iso(-260,-3)],'#465460');for(let i=-230;i<250;i+=55)line(i,-30,i+25,-30,'#ffffff',3);
+// terminal body
+block(-180,42,220,105,38,'#d7e7eb','#829da8','#9cb8c2');block(-160,55,180,80,18,'#6da5bd','#416d86','#4d829a');for(let x=-145;x<5;x+=30){let p=iso(x,57,19);ctx.fillStyle='#a9e0ed';ctx.fillRect(p[0]-7,p[1]-8,13,16)}
+// terminal roof glass and jetbridges
+block(-140,63,140,65,8,'#a9c6d0','#7b9aa8','#8eacb7');for(let x=-115;x<0;x+=48){block(x,24,18,30,8,'#d8e1e4','#9cabb3','#b5c4ca')}
+block(85,45,48,45,65,'#dfe9ed','#879ba7','#aabdc5');block(91,50,36,35,8,'#6c9bb2','#456d82','#527f95'); // control tower
+// service hangar
+block(180,65,90,75,30,'#e4e1d5','#9c9a91','#b3afa4');block(188,73,74,55,4,'#a8c4cb','#758d96','#879fa8');
+// parking apron stands
+for(let i=0;i<3;i++){let x=45+i*62;line(x,18,x+15,85,'#f4f1dc',2);let p=iso(x+15,85);ctx.fillStyle='#f6df8b';ctx.beginPath();ctx.arc(p[0],p[1],4,0,7);ctx.fill()}
+for(let i=0;i<12;i++)tree(-340+(i%6)*125,95+Math.floor(i/6)*95);
+for(let i=0;i<5;i++){let px=-210+i*90,py=150+Math.sin(tick*1.2+i)*7;let p=iso(px,py,0);ctx.fillStyle='#dce9ee';ctx.fillRect(p[0]-8,p[1]-3,16,7);ctx.fillStyle='#263e4c';ctx.fillRect(p[0]-5,p[1]+3,3,4);ctx.fillRect(p[0]+3,p[1]+3,3,4)}
+// taxi plane movement loop
+let t=(tick*13)%560;plane(-250+t,-125,.8,.12);plane(135,5+Math.sin(tick)*4,.7,-.15);
+// moving ground service carts
+for(let i=0;i<3;i++){let p=iso(-20+i*40,115+Math.sin(tick*1.8+i)*10,2);ctx.fillStyle='#f5bf50';ctx.fillRect(p[0]-7,p[1]-5,14,8);ctx.fillStyle='#283b48';ctx.beginPath();ctx.arc(p[0]-4,p[1]+4,2,0,7);ctx.arc(p[0]+4,p[1]+4,2,0,7);ctx.fill()}
+ctx.fillStyle='#173047';ctx.font='bold 13px system-ui';ctx.fillText('RUNWAY 01',385,70);ctx.fillStyle='#e7f7ff';ctx.font='bold 12px system-ui';ctx.fillText('TERMINAL',345,360);ctx.fillStyle='#ffffffbb';ctx.font='11px system-ui';ctx.fillText('GATE A1',540,390);
+requestAnimationFrame(draw)}draw();
 </script></body></html>
