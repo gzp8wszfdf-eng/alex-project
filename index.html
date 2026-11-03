@@ -75,7 +75,37 @@ header .stat b{font-size:13px}
 #empireUpgrade button{padding:9px 8px;white-space:nowrap}
 @media(max-width:390px){#empireLeft{width:126px;padding:10px}#empireRight{width:145px;padding:10px}.empireLabel{font-size:8px}#empireLeft strong{font-size:19px}#empireRight>span{font-size:9px}#empireUpgrade{width:calc(100vw - 24px)}}
 @media(min-width:700px){#empireLeft{left:22px;top:145px;width:190px;padding:16px}#empireRight{right:22px;top:145px;width:220px;padding:16px}#empireUpgrade{left:22px;bottom:95px;width:360px}}
- #levelHud{position:fixed;z-index:16;left:13px;top:calc(env(safe-area-inset-top) + 142px);padding:9px 12px;border:1px solid #ffffff35;border-radius:12px;background:linear-gradient(135deg,#102b45eF,#173e5de8);color:#fff;box-shadow:0 5px 18px #0004;backdrop-filter:blur(10px);font:800 11px system-ui;letter-spacing:.35px}#levelHud b{color:#ffd477;font-size:17px;margin-left:4px}#levelHud small{display:block;color:#c8d9e8;font-size:9px;margin-top:2px;font-weight:600}</style></head><body>
+ #levelHud{position:fixed;z-index:16;left:13px;top:calc(env(safe-area-inset-top) + 142px);padding:9px 12px;border:1px solid #ffffff35;border-radius:12px;background:linear-gradient(135deg,#102b45eF,#173e5de8);color:#fff;box-shadow:0 5px 18px #0004;backdrop-filter:blur(10px);font:800 11px system-ui;letter-spacing:.35px}#levelHud b{color:#ffd477;font-size:17px;margin-left:4px}#levelHud small{display:block;color:#c8d9e8;font-size:9px;margin-top:2px;font-weight:600}
+/* REFERENCE DESIGN: premium airport empire HUD */
+header{top:calc(env(safe-area-inset-top) + 10px)!important;bottom:auto!important;left:12px!important;right:auto!important;width:min(390px,calc(100vw - 24px))!important;padding:10px!important;border:1px solid #d5eaff35!important;border-radius:16px!important;background:linear-gradient(145deg,rgba(9,27,48,.91),rgba(16,48,73,.82))!important;box-shadow:0 10px 32px #06101d66!important}
+header .top{display:flex!important;align-items:center!important}
+header .logo{font-size:12px!important;letter-spacing:.7px!important}
+header .muted{font-size:9px!important}
+header .tag{display:none}
+header .stats{grid-template-columns:repeat(3,minmax(0,1fr))!important;margin-top:8px!important;gap:6px!important}
+header .stat{background:#d8edff12!important;border:1px solid #d8edff20!important;padding:7px!important}
+header .stat small{font-size:9px!important;color:#c1d6e9!important}
+header .stat b{font-size:14px!important}
+#levelHud{left:auto!important;right:12px!important;top:calc(env(safe-area-inset-top) + 12px)!important;min-width:112px;text-align:center;padding:10px 13px!important;border:1px solid #ffdf91aa!important;border-radius:15px!important;background:linear-gradient(145deg,#a86b1eF2,#573a18F2)!important;box-shadow:0 7px 24px #0007, inset 0 1px #fff7!important}
+#levelHud:before{content:'✦ MAX LEVEL ✦';display:block;color:#ffe8ad;font-size:8px;letter-spacing:1.1px;margin-bottom:3px}
+#levelHud b{font-size:22px!important;color:#fff0bd!important}
+#levelHud small{font-size:9px!important;color:#ffe4aa!important}
+#gameDock{grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:6px!important;padding:8px 8px calc(8px + env(safe-area-inset-bottom))!important;background:linear-gradient(0deg,#081523 78%,#0b1b2ddd)!important;border-top:1px solid #d9edff2a!important;box-shadow:0 -8px 25px #06101d55}
+.dockBtn{min-height:56px;border-radius:12px!important;background:linear-gradient(145deg,#203d59,#142a42)!important;border:1px solid #d7eaff20!important;font-size:9px!important;color:#e9f4ff!important}
+.dockBtn span{font-size:19px!important}
+.dockBtn.active{background:linear-gradient(145deg,#d69a3e,#98601e)!important;border-color:#ffe1a0!important;color:#211506!important}
+#sideQuickMenu{position:fixed;z-index:38;left:10px;top:50%;transform:translateY(-42%);display:flex;flex-direction:column;gap:8px}
+#sideQuickMenu button{width:116px;min-height:42px;text-align:left;padding:8px 10px;border:1px solid #dceeff35;border-radius:12px;background:linear-gradient(145deg,#173754ed,#10263eeF);color:#f2f7ff;font:800 10px system-ui;box-shadow:0 5px 16px #0005;backdrop-filter:blur(10px)}
+#sideQuickMenu button span{font-size:16px;vertical-align:middle;margin-right:6px}
+#sideQuickMenu button:active{transform:scale(.96);background:#34658a}
+#cameraTools{right:10px!important;bottom:calc(145px + env(safe-area-inset-bottom))!important;top:auto!important}
+#musicToggle{left:auto!important;right:10px!important;bottom:calc(332px + env(safe-area-inset-bottom))!important;font-size:9px!important;padding:7px 9px!important}
+.panel{bottom:calc(140px + env(safe-area-inset-bottom))!important;max-height:52dvh!important}
+#closeSheet{bottom:calc(140px + 52dvh + env(safe-area-inset-bottom))!important}
+.toast{bottom:calc(145px + env(safe-area-inset-bottom))!important}
+@media(max-width:390px){header{width:calc(100vw - 24px)!important}#sideQuickMenu{left:7px}#sideQuickMenu button{width:104px;font-size:9px;padding:7px}#levelHud{right:8px!important;min-width:100px}}
+@media(min-width:700px){header{width:390px!important;left:22px!important;top:18px!important}#levelHud{right:24px!important;top:20px!important}#sideQuickMenu{left:22px}#gameDock{width:min(650px,100%)!important}}
+</style></head><body>
 <header><div class="top"><div><div class="logo">✈ IDLE AIRPORT EMPIRE</div><div class="muted">Построй аэропорт мирового уровня</div></div><span class="tag" id="levelTag">⭐ УРОВЕНЬ 1</span></div><div class="stats"><div class="stat"><small>💰 Деньги</small><b class="gold" id="money">500</b></div><div class="stat"><small>📈 Доход / мин</small><b id="income">12</b></div><div class="stat"><small>🧍 Пассажиры</small><b id="pax">24</b></div></div></header>
 <div class="empireUpgradeText"><b>УЛУЧШИТЬ ТЕРМИНАЛ</b><span>Увеличь поток пассажиров</span><small>Инвестиции в развитие</small></div>
  <button id="hudTerminal" type="button">ОТКРЫТЬ</button>
@@ -843,11 +873,13 @@ baggageBags.forEach((bag,i)=>{const phase=(t*.42+i*.2)%1;bag.position.z=2.9+phas
 <script>
 (()=>{
  const panels=[...document.querySelectorAll('main>.panel')];
- const labels=[['✈️','Рейсы'],['🏗️','Здания'],['👥','Персонал'],['📋','Задания'],['🛩️','Авиапарк'],['🎁','Бонус']];
+ const labels=[['🛩️','Самолёты'],['🏬','Ангары'],['🛒','Магазин'],['⚙️','Улучшения'],['🏆','Достижения'],['☰','Настройки']];
  const dock=document.createElement('nav');dock.id='gameDock';
- const sectionFor=[0,1,2,3,4,5];
+ const sectionFor=[5,2,5,1,4,6];
  labels.forEach(([ico,label],i)=>{const b=document.createElement('button');b.className='dockBtn';b.innerHTML='<span>'+ico+'</span>'+label;b.addEventListener('click',()=>{const target=panels[sectionFor[i]];const was=target.classList.contains('active');panels.forEach(p=>p.classList.remove('active'));dock.querySelectorAll('button').forEach(x=>x.classList.remove('active'));if(!was){target.classList.add('active');b.classList.add('active');if(i===4&&window.renderAircraft)window.renderAircraft()}});dock.appendChild(b)});
  document.body.appendChild(dock);
+ const quick=document.createElement('aside');quick.id='sideQuickMenu';
+ [['📋','Задания',4],['👥','Персонал',3],['🛫','ВПП',2]].forEach(([ico,label,index])=>{const b=document.createElement('button');b.type='button';b.innerHTML='<span>'+ico+'</span>'+label;b.addEventListener('click',()=>{const target=panels[index];const was=target.classList.contains('active');panels.forEach(p=>p.classList.remove('active'));dock.querySelectorAll('button').forEach(x=>x.classList.remove('active'));if(!was)target.classList.add('active')});quick.appendChild(b)});document.body.appendChild(quick);
  const close=document.createElement('button');close.id='closeSheet';close.textContent='×';close.onclick=()=>{panels.forEach(p=>p.classList.remove('active'));dock.querySelectorAll('button').forEach(x=>x.classList.remove('active'))};document.body.appendChild(close);
  const observer=new MutationObserver(()=>{close.style.display=panels.some(p=>p.classList.contains('active'))?'block':'none'});panels.forEach(p=>observer.observe(p,{attributes:true,attributeFilter:['class']}));
  // Make the 3D playfield fill the phone screen and recalculate renderer size.
