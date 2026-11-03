@@ -153,6 +153,7 @@ const sun=new THREE.DirectionalLight(0xfff0d5,2.2);sun.position.set(-25,48,25);s
 const M=(c,r=.8)=>new THREE.MeshStandardMaterial({color:c,roughness:r});
 const grass=M(0x679b68),road=M(0x424f59),concrete=M(0xb8c2c2),white=M(0xf4f1df),wall=M(0xdce5e5),glass=M(0x559db7,.3),blue=M(0x477d9a),yellow=M(0xf2bb45),dark=M(0x273846),roof=M(0x819ba5);
 const world=new THREE.Group();scene.add(world);
+const label=(txt,x,y,z)=>{const c=document.createElement('canvas');c.width=512;c.height=128;const q=c.getContext('2d');q.fillStyle='#12324a';q.font='bold 58px system-ui';q.textAlign='center';q.fillText(txt,256,82);const tex=new THREE.CanvasTexture(c);const m=new THREE.MeshBasicMaterial({map:tex,transparent:true});const o=new THREE.Mesh(new THREE.PlaneGeometry(12,3),m);o.rotation.x=-Math.PI/2;o.position.set(x,y,z);world.add(o)};
 function box(x,y,z,w,h,d,m,parent=world){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y+h/2,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}
 function slab(x,z,w,d,m,y=.04){const o=new THREE.Mesh(new THREE.BoxGeometry(w,.12,d),m);o.position.set(x,y,z);o.receiveShadow=true;world.add(o);return o}
 const floor=new THREE.Mesh(new THREE.PlaneGeometry(150,125),grass);floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;world.add(floor);
@@ -353,7 +354,6 @@ const runwayLength=54+Math.min(8,lv.runway-1)*5;
 const extraRunway=lv.runway>1?slab(0,-44,runwayLength,5,road):null;
 // runway extension markings
 if(lv.runway>1)for(let x=-runwayLength/2+3;x<runwayLength/2;x+=6)slab(x,-44,.25,.5,white,.13);
-const label=(txt,x,y,z)=>{const c=document.createElement('canvas');c.width=512;c.height=128;const q=c.getContext('2d');q.fillStyle='#12324a';q.font='bold 58px system-ui';q.textAlign='center';q.fillText(txt,256,82);const tex=new THREE.CanvasTexture(c);const m=new THREE.MeshBasicMaterial({map:tex,transparent:true});const o=new THREE.Mesh(new THREE.PlaneGeometry(12,3),m);o.rotation.x=-Math.PI/2;o.position.set(x,y,z);world.add(o)};
 label('TERMINAL',-5,6.4,15.7);label('GATE A1',-19,.3,2);
 let radius=52,theta=.78,phi=1.02;const target=new THREE.Vector3(0,0,0);
 function cam(){camera.position.set(target.x+radius*Math.sin(phi)*Math.sin(theta),target.y+radius*Math.cos(phi),target.z+radius*Math.sin(phi)*Math.cos(theta));camera.lookAt(target)}
