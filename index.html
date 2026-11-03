@@ -691,6 +691,10 @@ for(const x of [-.55,.55])for(const z of [-.72,.72]){
  wheel.rotation.z=Math.PI/2;wheel.position.set(x,.2,z);passengerStairs.add(wheel);
 }
 passengerStairs.position.set(-20.2,0,-7.2);passengerStairs.visible=false;world.add(passengerStairs);
+const arrivalStairs=passengerStairs.clone(true);
+arrivalStairs.position.set(16,0,-7.2);
+arrivalStairs.visible=false;
+world.add(arrivalStairs);
 const clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();const smooth=u=>{u=Math.max(0,Math.min(1,u));return u*u*(3-2*u)};const mix=(a,b,u)=>a+(b-a)*smooth(u);// Прилёт: заход, касание полосы, пробег и руление к стоянке.
 const arrivalCycle=t%72,arrival=planes[0];
 arrival.rotation.z=0;arrival.rotation.y=-Math.PI/2;
@@ -707,13 +711,19 @@ if(arrivalCycle<18){
 }else if(arrivalCycle<62){
  arrival.visible=true;arrival.position.set(12,.12,-7);arrival.rotation.y=0;arrival.rotation.z=.008*Math.sin(t*1.7);
 }else{arrival.visible=false;}
-// Высадка прибывших: пассажиры с чемоданами идут от борта к терминалу.
+// Высадка: пассажиры спускаются по трапу и идут к терминалу.
+arrivalStairs.visible=arrivalCycle>=40&&arrivalCycle<62;
 arrivingPeople.forEach((p,i)=>{
  const q=p.userData,walk=arrivalCycle-42-q.offset;
  p.visible=walk>0&&walk<19;
  if(p.visible){
-  const progress=Math.min(1,walk/17);
-  p.position.set(12+(i-2.5)*.82,0,-4+progress*19);
+  if(walk<7){
+   const u=smooth(walk/7);
+   p.position.set(16+(i-2.5)*.12,mix(2.12,.35,u),mix(-9.45,-4.8,u));
+  }else{
+   const u=smooth((walk-7)/12);
+   p.position.set(mix(16,12+(i-2.5)*.82,u),0,mix(-4.8,15,u));
+  }
   q.legA.rotation.x=Math.sin(t*8+i)*.46;
   q.legB.rotation.x=-Math.sin(t*8+i)*.46;
  }
