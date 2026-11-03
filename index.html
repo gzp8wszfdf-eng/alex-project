@@ -233,6 +233,23 @@ for(let i=0;i<Math.min(7,3+lv.terminal);i++){
 }
 // Parking lot and cars
 slab(-20,31,38,16,road);for(let x=-36;x<-2;x+=4){slab(x,25,.15,9,white,.13)}
+// Наземная техника: багажные тягачи, автобусы и топливозаправщик
+const serviceVehicles=[];
+function serviceVan(x,z,color=0xf2bb45,type='cart'){
+ const g=new THREE.Group();
+ const body=new THREE.Mesh(new THREE.BoxGeometry(type==='bus'?2.5:1.65,type==='bus'?1.25:.72,type==='bus'?4.4:2.5),M(color));
+ body.position.y=type==='bus'?1.0:.62;g.add(body);
+ const cab=new THREE.Mesh(new THREE.BoxGeometry(1.5,.72,1.05),glass);cab.position.set(0,type==='bus'?1.25:1.12,.55);g.add(cab);
+ for(const xx of [-.62,.62])for(const zz of [-.72,.72]){
+  const w=new THREE.Mesh(new THREE.CylinderGeometry(.22,.22,.14,10),dark);w.rotation.z=Math.PI/2;w.position.set(xx,.23,zz);g.add(w);
+ }
+ g.position.set(x,0,z);world.add(g);serviceVehicles.push(g);return g;
+}
+serviceVan(-17,-12,0xf4c04f,'cart');
+serviceVan(-12,-13,0xe9edf0,'cart');
+serviceVan(-28,-13,0xe8a83b,'cart');
+serviceVan(-3,-14,0xf0f0e8,'bus');
+serviceVan(6,-14,0xe5ad39,'cart');
 const cars=[];for(let i=0;i<Math.min(3+lv.staff,10);i++){const g=new THREE.Group();const b=new THREE.Mesh(new THREE.BoxGeometry(1.8,.8,1.05),i%2?yellow:blue);b.position.y=.55;g.add(b);const top=new THREE.Mesh(new THREE.BoxGeometry(1.05,.45,.9),wall);top.position.set(-.1,1.12,0);g.add(top);for(const x of [-.62,.62])for(const z of [-.39,.39]){const w=new THREE.Mesh(new THREE.CylinderGeometry(.22,.22,.16,14),dark);w.rotation.z=Math.PI/2;w.position.set(x,.22,z);g.add(w)}const windshield=new THREE.Mesh(new THREE.BoxGeometry(.78,.32,.92),glass);windshield.position.set(-.08,1.16,.02);g.add(windshield);g.position.set(-34+i*4,0,31+(i%2)*3);world.add(g);cars.push(g)}
 const people=[];for(let i=0;i<12;i++){const p=new THREE.Group(),body=new THREE.Mesh(new THREE.CylinderGeometry(.18,.23,.72,8),M(i%3===0?0x315b91:i%3===1?0xe8e1d0:0x4c9b83)),head=new THREE.Mesh(new THREE.SphereGeometry(.19,10,8),M(0xe5b995));body.position.y=.78;head.position.y=1.28;p.add(body,head);const leg1=new THREE.Mesh(new THREE.BoxGeometry(.12,.48,.14),dark),leg2=leg1.clone();leg1.position.set(-.1,.24,0);leg2.position.set(.1,.24,0);p.add(leg1,leg2);p.userData={phase:i*.8,leg1,leg2};p.position.set(-31+(i%4)*2,0,29+Math.floor(i/4)*2);world.add(p);people.push(p)}
 // Периметр аэропорта и дальняя городская застройка на горизонте.
@@ -285,7 +302,13 @@ renderer.domElement.addEventListener('wheel',e=>{radius=Math.max(27,Math.min(100
 window.addEventListener('airport-aircraft-bought',e=>{const kind=e.detail||'commuter',color=kind==='cargo'?0xf0d9a0:kind==='jet'?0xeaf4ff:0xd9edf5,scale=kind==='cargo'?.61:kind==='jet'?.68:.48;planes.push(plane(-27+(planes.length%5)*12,-5-(planes.length%2)*9,scale,color,kind))});
 window.airportCamera={zoom:d=>{radius=Math.max(27,Math.min(100,radius+d));cam()},rotate:d=>{theta+=d;cam()},reset:()=>{radius=52;theta=.78;phi=1.02;target.set(0,0,0);cam()}};
 document.getElementById('camZoomIn').onclick=()=>window.airportCamera.zoom(-6);document.getElementById('camZoomOut').onclick=()=>window.airportCamera.zoom(6);document.getElementById('camRotate').onclick=()=>window.airportCamera.rotate(Math.PI/4);document.getElementById('camReset').onclick=()=>window.airportCamera.reset();
-const clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();const flightX=-48+(t*2.9%96);planes[0].position.x=flightX;planes[0].position.z=-52;planes[0].position.y=Math.max(0,(flightX-28)*.22);planes[0].rotation.y=Math.PI/2;planes[1].position.y=0.03*Math.sin(t*2);const daylight=(Math.sin(t*.035-1.2)+1)/2;const night=1-daylight;sun.intensity=.35+1.95*daylight;scene.background.setRGB(.035+.57*daylight,.075+.68*daylight,.15+.70*daylight);scene.fog.color.copy(scene.background);const weather=document.getElementById('weather');if(weather)weather.textContent=daylight>.62?'☀ ДЕНЬ · 22°':daylight<.28?'🌙 НОЧЬ · 14°':'🌆 ВЕЧЕР · 18°';lights.forEach(l=>{l.material.emissiveIntensity=.12+night*.9});cars.forEach((c,i)=>{const phase=(t*.13+i*.23)%1,slot=-33+i*6;c.position.x=phase<.55?-39+(slot+39)*(phase/.55):slot;c.position.z=phase<.55?31:27+(i%2)*3;c.rotation.y=phase<.55?Math.PI/2:0});people.forEach((p,i)=>{const q=p.userData,phase=(t*.42+q.phase)%1;p.position.x=-25+phase*18;p.position.z=25+Math.sin(t*.8+q.phase)*1.5;q.leg1.rotation.x=Math.sin(t*7+q.phase)*.45;q.leg2.rotation.x=-Math.sin(t*7+q.phase)*.45});lights.forEach((l,i)=>{l.material.emissive=new THREE.Color(0xffdf85);l.material.emissiveIntensity=.12+night*.9});renderer.render(scene,camera)}animate();
+const clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();const flightX=-48+(t*2.9%96);planes[0].position.x=flightX;planes[0].position.z=-52;planes[0].position.y=Math.max(0,(flightX-28)*.22);planes[0].rotation.y=Math.PI/2;// Цикл рейса: руление к гейту, стоянка и выезд на рулёжную дорожку.
+const serviceCycle=(t%52),gateX=-24;
+if(serviceCycle<7){planes[1].position.x=gateX+Math.max(0,7-serviceCycle)*1.1;planes[1].position.z=-13+serviceCycle*.85;planes[1].rotation.y=0;planes[1].position.y=.02}
+else if(serviceCycle<35){planes[1].position.x=gateX;planes[1].position.z=-7;planes[1].rotation.y=0;planes[1].position.y=.025*Math.sin(t*2)}
+else{const leave=serviceCycle-35;planes[1].position.x=gateX+leave*1.15;planes[1].position.z=-7-leave*.45;planes[1].rotation.y=Math.PI/2;planes[1].position.y=.02}
+serviceVehicles.forEach((v,i)=>{const phase=(t*.22+i*.21)%1;v.position.x=-31+phase*22;v.position.z=-13-(i%2)*1.7;v.rotation.y=Math.PI/2});
+const daylight=(Math.sin(t*.035-1.2)+1)/2;const night=1-daylight;sun.intensity=.35+1.95*daylight;scene.background.setRGB(.035+.57*daylight,.075+.68*daylight,.15+.70*daylight);scene.fog.color.copy(scene.background);const weather=document.getElementById('weather');if(weather)weather.textContent=daylight>.62?'☀ ДЕНЬ · 22°':daylight<.28?'🌙 НОЧЬ · 14°':'🌆 ВЕЧЕР · 18°';lights.forEach(l=>{l.material.emissiveIntensity=.12+night*.9});cars.forEach((c,i)=>{const phase=(t*.13+i*.23)%1,slot=-33+i*6;c.position.x=phase<.55?-39+(slot+39)*(phase/.55):slot;c.position.z=phase<.55?31:27+(i%2)*3;c.rotation.y=phase<.55?Math.PI/2:0});people.forEach((p,i)=>{const q=p.userData,phase=(t*.42+q.phase)%1;p.position.x=-25+phase*18;p.position.z=25+Math.sin(t*.8+q.phase)*1.5;q.leg1.rotation.x=Math.sin(t*7+q.phase)*.45;q.leg2.rotation.x=-Math.sin(t*7+q.phase)*.45});lights.forEach((l,i)=>{l.material.emissive=new THREE.Color(0xffdf85);l.material.emissiveIntensity=.12+night*.9});renderer.render(scene,camera)}animate();
 </script>
 
 <script>
