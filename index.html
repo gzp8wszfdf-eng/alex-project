@@ -209,6 +209,34 @@ for(let i=0;i<4;i++){
 }
 box(-9,3.1,4.2,13,.12,.18,yellow,terminal);
 label('CHECK IN',-9,3.3,4.1);
+// Зона ожидания: ряды кресел, опоры, табло вылетов и интерьерное освещение.
+const seatMat=M(0x24516a),seatLeg=M(0x526573),indoorGlow=M(0xffdf9b,.35),screenMat=M(0x102b43,.15);
+for(let row=0;row<2;row++){
+ for(let i=0;i<5;i++){
+  const x=-13+i*4.3,z=10.2+row*2.35;
+  box(x,.68,z,1.18,.22,.62,seatMat,terminal);
+  box(x,.98,z-.23,1.18,.68,.18,seatMat,terminal);
+  for(const dx of [-.48,.48])box(x+dx,.32,z,.09,.58,.1,seatLeg,terminal);
+ }
+}
+for(const x of [-16,-8,0,7]){
+ box(x,2.45,13.6,.22,4.9,.22,roof,terminal);
+ const lamp=new THREE.Mesh(new THREE.BoxGeometry(2.2,.08,.45),indoorGlow);
+ lamp.position.set(x,4.82,7.3);terminal.add(lamp);lights.push(lamp);
+}
+box(-4,3.8,14.6,8.2,1.35,.22,screenMat,terminal);
+for(let i=0;i<3;i++){
+ box(-6.5+i*2.5,3.85,14.43,1.9,.72,.06,M(0x174e69,.2),terminal);
+ box(-6.5+i*2.5,4.18,14.38,1.2,.045,.035,M(0x75d9ee,.45),terminal);
+}
+label('DEPARTURES',-4,4.62,14.35);
+// Небольшие декоративные растения у зоны ожидания.
+for(const x of [-17,8]){
+ const pot=new THREE.Mesh(new THREE.CylinderGeometry(.35,.27,.55,10),M(0x52616b));
+ pot.position.set(x,.28,11);terminal.add(pot);
+ const foliage=new THREE.Mesh(new THREE.SphereGeometry(.62,10,8),M(0x347b59));
+ foliage.position.set(x,.98,11);terminal.add(foliage);
+}
 // Лента выдачи багажа и чемоданы.
 box(7,.55,5.7,3.2,.55,6.2,dark);
 box(7,.88,5.7,3.05,.12,5.95,M(0x354957));
