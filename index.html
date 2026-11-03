@@ -363,11 +363,11 @@ function serviceVan(x,z,color=0xf2bb45,type='cart'){
  if(type==='cart'){const beacon=new THREE.Mesh(new THREE.SphereGeometry(.09,10,8),M(0xffb52e,.25));beacon.position.set(0,1.12,.25);g.add(beacon)}
  g.userData.wheels=wheels;g.position.set(x,0,z);world.add(g);serviceVehicles.push(g);return g;
 }
-serviceVan(-17,-12,0xf4c04f,'cart');
-serviceVan(-12,-13,0xe9edf0,'cart');
-serviceVan(-28,-13,0xe8a83b,'cart');
-serviceVan(-3,-14,0xf0f0e8,'bus');
-serviceVan(6,-14,0xe5ad39,'cart');
+serviceVan(-34,-20,0xf4c04f,'cart');
+serviceVan(-25,-20,0xe9edf0,'cart');
+serviceVan(-16,-20,0xe8a83b,'cart');
+serviceVan(-7,-20,0xf0f0e8,'bus');
+serviceVan(5,-20,0xe5ad39,'cart');
 // Спецтехника рейса: топливозаправщик с цистерной и багажные платформы.
 const flightFuel=new THREE.Group();
 const fuelBase=new THREE.Mesh(new THREE.BoxGeometry(1.55,.72,3.1),M(0xe5c13b));fuelBase.position.y=.62;flightFuel.add(fuelBase);
@@ -389,21 +389,32 @@ function buildCar(color=0x2f82b8,type='sedan'){
  const g=new THREE.Group(),wheels=[],paint=M(color,.32),rubber=M(0x171d24,.95),rim=M(0xaebbc3,.28),windowMat=M(0x7eb7cb,.22),lamp=M(0xfff1c2,.2),tail=M(0xe54b43,.3);
  const length=type==='van'?2.65:2.35,width=type==='van'?1.08:1.12;
  const lower=new THREE.Mesh(new THREE.BoxGeometry(width,.48,length),paint);lower.position.y=.48;g.add(lower);
+ const sill=new THREE.Mesh(new THREE.BoxGeometry(width*1.015,.13,length*.76),dark);sill.position.set(0,.31,-.02);g.add(sill);
  const hood=new THREE.Mesh(new THREE.BoxGeometry(width*.94,.22,.68),paint);hood.position.set(0,.77,length*.34);g.add(hood);
+ const hoodLine=new THREE.Mesh(new THREE.BoxGeometry(width*.78,.018,.48),M(0xffffff,.5));hoodLine.position.set(0,.887,length*.34);g.add(hoodLine);
  const cabin=new THREE.Mesh(new THREE.BoxGeometry(width*.82,.53,type==='van'?1.18:1.12),windowMat);cabin.position.set(0,.91,-.12);g.add(cabin);
  const roof=new THREE.Mesh(new THREE.BoxGeometry(width*.78,.12,type==='van'?1.05:.92),paint);roof.position.set(0,1.2,-.12);g.add(roof);
  const frontGlass=new THREE.Mesh(new THREE.BoxGeometry(width*.78,.34,.045),windowMat);frontGlass.position.set(0,.99,.48);frontGlass.rotation.x=-.28;g.add(frontGlass);
  const rearGlass=frontGlass.clone();rearGlass.position.z=-.72;rearGlass.rotation.x=.28;g.add(rearGlass);
  for(const side of [-1,1]){
   const sideGlass=new THREE.Mesh(new THREE.BoxGeometry(.035,.27,.78),windowMat);sideGlass.position.set(side*width*.415,.98,-.12);g.add(sideGlass);
+  const divider=new THREE.Mesh(new THREE.BoxGeometry(.045,.29,.035),dark);divider.position.set(side*width*.44,.98,-.12);g.add(divider);
   const mirror=new THREE.Mesh(new THREE.BoxGeometry(.13,.09,.18),paint);mirror.position.set(side*.62,.88,.36);g.add(mirror);
+  const handle=new THREE.Mesh(new THREE.BoxGeometry(.13,.035,.035),rim);handle.position.set(side*width*.505,.79,-.17);g.add(handle);
   for(const z of [-.72,.72]){
    const tire=new THREE.Mesh(new THREE.CylinderGeometry(.27,.27,.16,18),rubber);tire.rotation.z=Math.PI/2;tire.position.set(side*.57,.29,z);g.add(tire);wheels.push(tire);
    const hub=new THREE.Mesh(new THREE.CylinderGeometry(.13,.13,.17,14),rim);hub.rotation.z=Math.PI/2;hub.position.copy(tire.position);g.add(hub);
+   const cap=new THREE.Mesh(new THREE.CylinderGeometry(.055,.055,.18,12),dark);cap.rotation.z=Math.PI/2;cap.position.copy(tire.position);g.add(cap);
+   const arch=new THREE.Mesh(new THREE.TorusGeometry(.29,.045,6,18,Math.PI),dark);arch.rotation.z=Math.PI;arch.position.set(side*.57,.34,z);g.add(arch);
   }
   const head=new THREE.Mesh(new THREE.BoxGeometry(.24,.13,.045),lamp);head.position.set(side*.36,.62,1.19);g.add(head);
+  const headInner=new THREE.Mesh(new THREE.BoxGeometry(.11,.045,.048),M(0xffffff,.2));headInner.position.set(side*.36,.63,1.215);g.add(headInner);
   const rear=new THREE.Mesh(new THREE.BoxGeometry(.22,.13,.045),tail);rear.position.set(side*.36,.62,-1.19);g.add(rear);
+  const rearInner=new THREE.Mesh(new THREE.BoxGeometry(.1,.045,.048),M(0xffb0a2,.25));rearInner.position.set(side*.36,.63,-1.215);g.add(rearInner);
  }
+ const grille=new THREE.Mesh(new THREE.BoxGeometry(width*.42,.13,.035),dark);grille.position.set(0,.53,1.205);g.add(grille);
+ for(let n=0;n<5;n++){const slat=new THREE.Mesh(new THREE.BoxGeometry(width*.34,.018,.045),rim);slat.position.set(0,.49+n*.022,1.23);g.add(slat)}
+ const plate=new THREE.Mesh(new THREE.BoxGeometry(.3,.09,.025),white);plate.position.set(0,.43,1.23);g.add(plate);
  const bumper=new THREE.Mesh(new THREE.BoxGeometry(width*1.02,.14,.12),dark);bumper.position.set(0,.35,1.2);g.add(bumper);
  const backBumper=bumper.clone();backBumper.position.z=-1.2;g.add(backBumper);
  g.userData.wheels=wheels;return g;
@@ -572,11 +583,11 @@ serviceVehicles.forEach((v,i)=>{const a=(t*.075+i*.19)%(Math.PI*2),rx=11.2,rz=2.
 // Топливо и багаж обслуживают именно тот самолёт, который стоит у гейта.
 const fuelActive=serviceCycle>12&&serviceCycle<29;
 flightFuel.visible=fuelActive;
-flightFuel.position.set(fuelActive?-17.2:-38,0,fuelActive?-7.8:-20);
+flightFuel.position.set(fuelActive?-14.8:-38,0,fuelActive?-7.8:-20);
 flightFuel.rotation.y=Math.PI/2;
 const baggageActive=serviceCycle>9&&serviceCycle<25;
 baggageTrain.visible=baggageActive;
-baggageTrain.position.set(baggageActive?-30.5:-42,0,baggageActive?-7.5:-20);
+baggageTrain.position.set(baggageActive?-33.5:-42,0,baggageActive?-7.5:-20);
 baggageTrain.rotation.y=Math.PI/2;
 // Посадка: пассажиры выходят из терминала и подходят к борту во время стоянки.
 boardingPeople.forEach((p,i)=>{
