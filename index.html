@@ -120,7 +120,7 @@ header .stat b{font-size:14px!important}
 <section class="panel"><div class="row"><div><h2>🎁 ЕЖЕДНЕВНАЯ НАГРАДА</h2><div class="muted">Бонус директора аэропорта</div></div><button class="btn gold" id="daily">Забрать +100</button></div><p class="muted">Это внутриигровой бонус. Настоящую видеорекламу подключим отдельно.</p></section>
 <div class="muted" style="text-align:center;padding:15px">IDLE AIRPORT EMPIRE · EARLY ACCESS 0.2</div></main><div id="cameraTools" aria-label="Управление камерой"><button id="camZoomIn" aria-label="Приблизить">＋</button><button id="camZoomOut" aria-label="Отдалить">−</button><button id="camRotate" aria-label="Повернуть камеру">↻</button><button id="camReset" aria-label="Сбросить камеру">⌖</button></div><button id="musicToggle" aria-label="Музыка">♫ Музыка: выкл.</button><div class="toast" id="toast"></div>
 <script>
-const old=JSON.parse(localStorage.getItem('airportEmpireSave')||'{}');
+let old={};try{const raw=localStorage.getItem('airportEmpireSave');if(raw){const parsed=JSON.parse(raw);if(parsed&&typeof parsed==='object'&&!Array.isArray(parsed))old=parsed}}catch(e){console.warn('Повреждённое сохранение — запуск с безопасными настройками',e)}
 const defaults={money:500,level:1,xp:0,terminal:1,runway:1,extraRunways:0,staff:2,service:1,fleet:1,last:Date.now(),daily:0,flights:0,earned:0,tasks:{},aircraft:{commuter:1,jet:0,cargo:0,turboprop:0,narrow:0,wide:0,jumbo:0,supersonic:0}};
 let s={...defaults,...old,tasks:{...defaults.tasks,...(old.tasks||{})},aircraft:{...defaults.aircraft,...(old.aircraft||{})}};s.earned=s.earned||s.money||500;
 if(new URLSearchParams(location.search).has('maxlevel')){s.level=20;s.xp=0;s.money=Math.max(s.money,1000000);s.aircraft={...s.aircraft,commuter:1,turboprop:1,cargo:1,jet:1,narrow:1,wide:1,jumbo:1,supersonic:1,mega:1,luxury:1,ultra:1,hypersonic:1,orbital:1};s.terminal=Math.max(s.terminal,10);s.runway=Math.max(s.runway,10);s.staff=Math.max(s.staff,10);s.service=Math.max(s.service,10);s.fleet=Math.max(s.fleet,10);save();history.replaceState({},'',location.pathname+location.hash)}
@@ -130,7 +130,7 @@ function cost(d){return Math.floor(d.base*Math.pow(1.62,s[d.id]-1))}
 function income(){const base=12+(s.terminal-1)*7+(s.runway-1)*9+(s.staff-2)*5+(s.service-1)*8+(s.fleet-1)*14+(s.aircraft.commuter||0)*8+(s.aircraft.jet||0)*22+(s.aircraft.cargo||0)*16+(s.aircraft.turboprop||0)*12+(s.aircraft.narrow||0)*38+(s.aircraft.wide||0)*72+(s.aircraft.jumbo||0)*135+(s.aircraft.supersonic||0)*260+(s.aircraft.mega||0)*420+(s.aircraft.luxury||0)*620+(s.aircraft.ultra||0)*900+(s.aircraft.hypersonic||0)*1350+(s.aircraft.orbital||0)*2100;return base*Math.pow(2,Math.min(4,s.extraRunways||0))}
 function save(){s.last=Date.now();try{localStorage.setItem('airportEmpireSave',JSON.stringify(s));return true}catch(e){console.error('Не удалось сохранить прогресс',e);return false}}window.addEventListener('pagehide',save);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')save()});window.addEventListener('beforeunload',save);
 function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),1700)}
-function render(){$('money').textContent=fmt(s.money);$('income').textContent=fmt(income());$('staffLevel').textContent=s.staff;$('staffBuy').textContent='Нанять · '+fmt(Math.floor(90*Math.pow(1.62,s.staff-1)))+' 💰';$('staffBuy').disabled=s.money<Math.floor(90*Math.pow(1.62,s.staff-2));$('pax').textContent=fmt(24+(s.terminal-1)*18+(s.staff-2)*7);$('levelTag').textContent='⭐ УРОВЕНЬ '+s.level;$('levelHudValue').textContent=s.level;$('levelHudXp').textContent=s.xp+' / '+s.level*100+' XP';const rb=$('buyRunway');if(rb){const rc=Math.floor(5000*Math.pow(3,s.extraRunways||0));$('runwayInfo').textContent='Построено дополнительных полос: '+(s.extraRunways||0)+' · каждая новая полоса удваивает весь доход навсегда.';rb.textContent=(s.extraRunways>=4?'Все полосы построены':'Построить · '+fmt(rc)+' 💰');rb.disabled=s.extraRunways>=4||s.money<rc;}$('xptext').textContent=s.xp+' / '+s.level*100+' XP';$('xpbar').style.width=Math.min(100,s.xp/(s.level*100)*100)+'%';$('flightCount').textContent=s.flights+' рейсов';$('taskFlights').textContent=Math.min(5,s.flights)+' / 5';$('taskTerminal').textContent=Math.min(3,s.terminal)+' / 3';$('taskMoney').textContent=fmt(Math.min(1000,s.earned))+' / 1 000';[['Flights',s.flights>=5,250],['Terminal',s.terminal>=3,300],['Money',s.earned>=1000,400]].forEach(([id,ready,reward])=>{const b=$('claim'+id);b.disabled=!ready||!!s.tasks[id];b.textContent=s.tasks[id]?'Получено':'Награда +'+reward});$('daily').disabled=Date.now()-s.daily<86400000;
+function render(){$('money').textContent=fmt(s.money);$('income').textContent=fmt(income());$('staffLevel').textContent=s.staff;const staffCost=cost(defs.find(d=>d.id==='staff'));$('staffBuy').textContent='Нанять · '+fmt(staffCost)+' 💰';$('staffBuy').disabled=s.money<staffCost;$('pax').textContent=fmt(24+(s.terminal-1)*18+(s.staff-2)*7);$('levelTag').textContent='⭐ УРОВЕНЬ '+s.level;$('levelHudValue').textContent=s.level;$('levelHudXp').textContent=s.xp+' / '+s.level*100+' XP';const rb=$('buyRunway');if(rb){const rc=Math.floor(5000*Math.pow(3,s.extraRunways||0));$('runwayInfo').textContent='Построено дополнительных полос: '+(s.extraRunways||0)+' · каждая новая полоса удваивает весь доход навсегда.';rb.textContent=(s.extraRunways>=4?'Все полосы построены':'Построить · '+fmt(rc)+' 💰');rb.disabled=s.extraRunways>=4||s.money<rc;}$('xptext').textContent=s.xp+' / '+s.level*100+' XP';$('xpbar').style.width=Math.min(100,s.xp/(s.level*100)*100)+'%';$('flightCount').textContent=s.flights+' рейсов';$('taskFlights').textContent=Math.min(5,s.flights)+' / 5';$('taskTerminal').textContent=Math.min(3,s.terminal)+' / 3';$('taskMoney').textContent=fmt(Math.min(1000,s.earned))+' / 1 000';[['Flights',s.flights>=5,250],['Terminal',s.terminal>=3,300],['Money',s.earned>=1000,400]].forEach(([id,ready,reward])=>{const b=$('claim'+id);b.disabled=!ready||!!s.tasks[id];b.textContent=s.tasks[id]?'Получено':'Награда +'+reward});$('daily').disabled=Date.now()-s.daily<86400000;
 $('upgrades').innerHTML=defs.filter(d=>d.id!=='staff').map(d=>'<div class="upgrade"><div class="emoji">'+d.emoji+'</div><b>'+d.name+' · '+s[d.id]+'</b><p>'+d.desc+'<br>+'+d.rate+' монет/мин</p><button class="btn" '+(s.money<cost(d)?'disabled':'')+' data-buy="'+d.id+'">Улучшить · '+fmt(cost(d))+' 💰</button></div>').join('');document.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>buy(b.dataset.buy));$('dispatch').textContent='Обслужить · +'+(35+(s.terminal-1)*8+(s.service-1)*4);if($('aircraftShop'))renderAircraft()}
 function addXP(n){s.xp+=n;while(s.xp>=s.level*100){s.xp-=s.level*100;s.level++;toast('Новый уровень! Аэропорт растёт ⭐')}}
 function buy(id){let d=defs.find(x=>x.id===id),c=cost(d);if(s.money<c)return;s.money-=c;s[id]++;addXP(25);save();render();toast(d.name+' улучшен!')}
@@ -138,7 +138,7 @@ function claimTask(id,reward){if(s.tasks[id])return;const ready={Flights:s.fligh
 $('staffBuy').onclick=()=>buy('staff');$('buyRunway').onclick=()=>{const n=s.extraRunways||0,price=Math.floor(5000*Math.pow(3,n));if(n>=4||s.money<price)return;s.money-=price;s.extraRunways=n+1;save();render();window.dispatchEvent(new Event('airport-runways-updated'));toast('Новая ВПП построена! Доход x'+Math.pow(2,s.extraRunways)+' навсегда 🚀')};
 $('dispatch').onclick=()=>{let reward=35+(s.terminal-1)*8+(s.service-1)*4;s.money+=reward;s.earned+=reward;s.flights++;addXP(8);$('flightState').textContent='Рейс A-101 обслужен · следующий через минуту';save();render();toast('Рейс обслужен: +'+reward+' 💰')};
 $('daily').onclick=()=>{if(Date.now()-s.daily<86400000)return;s.money+=100;s.earned+=100;s.daily=Date.now();save();render();toast('Бонус директора +100 💰')};
-let elapsed=Math.max(0,Math.min(28800,(Date.now()-s.last)/1000));s.money+=income()*elapsed/60;
+let elapsed=Math.max(0,Math.min(28800,(Date.now()-Number(s.last||Date.now()))/1000));const offlineEarnings=income()*elapsed/60;s.money+=offlineEarnings;s.earned=(Number(s.earned)||0)+offlineEarnings;
 setInterval(()=>{s.money+=income()/60;s.earned+=income()/60;save();render()},1000);save();
 const aircraftDefs=[{id:'commuter',name:'Лёгкий региональный',icon:'🛩️',cost:450,rate:8,desc:'Компактный самолёт для коротких рейсов',unlock:1},{id:'turboprop',name:'Турбовинтовой',icon:'🛩️',cost:850,rate:12,desc:'Экономичный борт для небольших аэропортов',unlock:2},{id:'cargo',name:'Грузовой',icon:'📦',cost:1250,rate:16,desc:'Перевозит грузы и приносит стабильный доход',unlock:2},{id:'jet',name:'Региональный джет',icon:'✈️',cost:1800,rate:22,desc:'Быстрый пассажирский самолёт',unlock:3},{id:'narrow',name:'Среднемагистральный лайнер',icon:'🛫',cost:3600,rate:38,desc:'Популярный лайнер для маршрутов по стране',unlock:4},{id:'wide',name:'Широкофюзеляжный лайнер',icon:'🛬',cost:7500,rate:72,desc:'Вместительный самолёт для дальних перелётов',unlock:6},{id:'jumbo',name:'Большой двухпалубный',icon:'🛫',cost:15000,rate:135,desc:'Огромный лайнер для загруженных направлений',unlock:8},{id:'supersonic',name:'Сверхзвуковой лайнер',icon:'🚀',cost:30000,rate:260,desc:'Самый дорогой и быстрый самолёт авиапарка',unlock:10},{id:'mega',name:'Межконтинентальный гигант',icon:'🛫',cost:55000,rate:420,desc:'Огромная дальность и вместимость',unlock:12},{id:'luxury',name:'Премиум бизнес-джет',icon:'💎',cost:85000,rate:620,desc:'Элитные перелёты для VIP-пассажиров',unlock:14},{id:'ultra',name:'Сверхдальний лайнер',icon:'🌍',cost:130000,rate:900,desc:'Связывает самые дальние города мира',unlock:16},{id:'hypersonic',name:'Гиперзвуковой самолёт',icon:'⚡',cost:200000,rate:1350,desc:'Новое поколение скоростной авиации',unlock:18},{id:'orbital',name:'Орбитальный авиалайнер',icon:'🚀',cost:350000,rate:2100,desc:'Вершина технологий твоего аэропорта',unlock:20}];function renderAircraft(){const el=$('aircraftShop');if(!el)return;el.innerHTML=aircraftDefs.map(a=>{const owned=s.aircraft[a.id]||0,locked=s.level<a.unlock;return '<div class="upgrade"><div class="emoji">'+a.icon+'</div><b>'+a.name+' · '+owned+'</b><p>'+a.desc+'<br>+'+a.rate+' монет/мин · открытие с ур. '+a.unlock+'</p><button class="btn" data-plane="'+a.id+'" '+(locked||s.money<a.cost?'disabled':'')+'>'+(locked?'🔒 Уровень '+a.unlock:'Купить · '+fmt(a.cost)+' 💰')+'</button></div>'}).join('');el.querySelectorAll('[data-plane]').forEach(b=>b.onclick=()=>buyAircraft(b.dataset.plane))}function buyAircraft(id){const a=aircraftDefs.find(x=>x.id===id);if(!a||s.level<a.unlock||s.money<a.cost)return;s.money-=a.cost;s.aircraft[id]=(s.aircraft[id]||0)+1;s.earned+=0;addXP(35);save();render();window.dispatchEvent(new CustomEvent('airport-aircraft-bought',{detail:id}));toast('Новый самолёт в авиапарке! '+a.name)}
 render();window.renderAircraft=renderAircraft;
@@ -705,23 +705,23 @@ for(let i=0;i<6;i++){
  suitcase.position.set(.28,.42,.04);p.add(suitcase);
  p.userData={offset:i*.85,legA,legB};p.visible=false;world.add(p);arrivingPeople.push(p);
 }
-const people=[];for(let i=0;i<12;i++){const p=new THREE.Group(),body=new THREE.Mesh(new THREE.CylinderGeometry(.18,.23,.72,8),M(i%3===0?0x315b91:i%3===1?0xe8e1d0:0x4c9b83)),head=new THREE.Mesh(new THREE.SphereGeometry(.19,10,8),M(0xe5b995));body.position.y=.78;head.position.y=1.28;p.add(body,head);const leg1=new THREE.Mesh(new THREE.BoxGeometry(.12,.48,.14),dark),leg2=leg1.clone();leg1.position.set(-.1,.24,0);leg2.position.set(.1,.24,0);p.add(leg1,leg2);p.userData={phase:i*.8,leg1,leg2};p.position.set(-31+(i%4)*2,0,29+Math.floor(i/4)*2);world.add(p);people.push(p)}
+const people=[];for(let i=0;i<8;i++){const p=new THREE.Group(),body=new THREE.Mesh(new THREE.CylinderGeometry(.18,.23,.72,8),M(i%3===0?0x315b91:i%3===1?0xe8e1d0:0x4c9b83)),head=new THREE.Mesh(new THREE.SphereGeometry(.19,10,8),M(0xe5b995));body.position.y=.78;head.position.y=1.28;p.add(body,head);const leg1=new THREE.Mesh(new THREE.BoxGeometry(.12,.48,.14),dark),leg2=leg1.clone();leg1.position.set(-.1,.24,0);leg2.position.set(.1,.24,0);p.add(leg1,leg2);p.userData={phase:i*.72,leg1,leg2};p.position.set(-30,0,18);world.add(p);people.push(p)}
 // Периметр аэропорта и дальняя городская застройка на горизонте.
 for(let x=-65;x<=65;x+=5){
  const h=3.5+(Math.sin(x*1.7)+1)*2.2;
- const b=box(x,0,57,3.6,h,4.2,M(0x526777));
+ box(x,0,137,3.6,h,4.2,M(0x526777));
  for(let y=1.1;y<h;y+=1.25)for(let side of [-1,1]){
   const win=new THREE.Mesh(new THREE.BoxGeometry(.34,.42,.06),M(0xffd58a,.35));
-  win.position.set(x+(side*1.82),y,54.86);world.add(win);
+  win.position.set(x+(side*1.82),y,134.86);world.add(win);
  }
 }
 for(let x=-65;x<=65;x+=5){
- const post=box(x,0,49,.16,1.35,.16,dark);
+ box(x,0,129,.16,1.35,.16,dark);
  const lamp=new THREE.Mesh(new THREE.SphereGeometry(.12,8,6),M(0xffe3a1,.3));
- lamp.position.set(x,1.45,49);world.add(lamp);lights.push(lamp);
+ lamp.position.set(x,1.45,129);world.add(lamp);lights.push(lamp);
 }
-// Trees, lamps, terminal signage
-for(let i=0;i<28;i++){const g=new THREE.Group(),tr=new THREE.Mesh(new THREE.CylinderGeometry(.14,.2,1.1,7),M(0x76553b)),top=new THREE.Mesh(new THREE.SphereGeometry(.9,8,7),M(i%2?0x368458:0x4b9a62));tr.position.y=.55;top.position.y=1.55;g.add(tr,top);g.position.set(-48+(i%14)*7,0,44+Math.floor(i/14)*7);world.add(g)}
+// Trees, lamps, terminal signage — зелёная полоса за парковочным перроном.
+for(let i=0;i<28;i++){const g=new THREE.Group(),tr=new THREE.Mesh(new THREE.CylinderGeometry(.14,.2,1.1,7),M(0x76553b)),top=new THREE.Mesh(new THREE.SphereGeometry(.9,8,7),M(i%2?0x368458:0x4b9a62));tr.position.y=.55;top.position.y=1.55;g.add(tr,top);g.position.set(-48+(i%14)*7,0,119+Math.floor(i/14)*7);world.add(g)}
 function plane(x,z,scale=1,color=0xf2f4f5,model='jet'){
  const g=new THREE.Group(),landingWheels=[],body=M(color,.34),stripe=M(model==='cargo'?0xe5a83b:0x267da7,.32),engine=M(0x53616c,.55),glassCockpit=M(0x18394c,.18);
  const specs={commuter:[6.3,7.8],turboprop:[6.8,8.4],cargo:[9.2,12],jet:[8.1,11.2],narrow:[10.2,13.5],wide:[12.8,17],jumbo:[15.5,20],supersonic:[13.2,12.5]};const [len,w]=specs[model]||specs.jet;
@@ -768,7 +768,11 @@ function plane(x,z,scale=1,color=0xf2f4f5,model='jet'){
  g.userData.landingWheels=landingWheels;
  g.position.set(x,0,z);g.scale.setScalar(scale);world.add(g);return g
 }
-const planes=[plane(-24,-7,.78,0xf4f6fa,'commuter'),plane(12,-7,.72,lv.fleet>=2?0xd9e9f4:0xf4f6fa,'jet'),...Array.from({length:Math.min(5,lv.fleet-1)},(_,i)=>plane(-28+i*13,17,.48,i%2?0xf0d9a0:0xe8f1fa,'commuter')),...[['turboprop',0xeee8d5,.58],['cargo',0xf0d9a0,.61],['narrow',0xeaf4ff,.68],['wide',0xdceaf4,.72],['jumbo',0xf4f6fa,.78],['supersonic',0xe8f0ff,.7],['mega',0xe4edf4,.8],['luxury',0xc9d8e8,.58],['ultra',0xf0f4ff,.82],['hypersonic',0xb8d7ef,.75],['orbital',0xc7d5e8,.88]].flatMap(([model,color,scale],row)=>Array.from({length:Math.min(3,lv.aircraft[model]||0)},(_,i)=>plane(-26+i*18,23+row*5,scale,color,model)))];planes[1].rotation.y=Math.PI;rebuildPurchasedRunways();window.addEventListener('airport-runways-updated',rebuildPurchasedRunways);
+const planes=[plane(-24,-7,.78,0xf4f6fa,'commuter'),plane(12,-7,.72,lv.fleet>=2?0xd9e9f4:0xf4f6fa,'jet'),...Array.from({length:Math.min(5,lv.fleet-1)},(_,i)=>plane(-28+i*13,17,.48,i%2?0xf0d9a0:0xe8f1fa,'commuter'))];
+// Отдельная стоянка авиапарка на западном перроне: самолёты не попадают в город и не накладываются друг на друга.
+const fleetParking=[[-55,36],[-32,36],[-9,36],[-55,58],[-32,58],[-9,58],[-55,80],[-32,80],[-9,80],[-55,102],[-32,102],[-9,102]];
+[['turboprop',0xeee8d5,.58],['cargo',0xf0d9a0,.61],['narrow',0xeaf4ff,.68],['wide',0xdceaf4,.72],['jumbo',0xf4f6fa,.78],['supersonic',0xe8f0ff,.7],['mega',0xe4edf4,.8],['luxury',0xc9d8e8,.58],['ultra',0xf0f4ff,.82],['hypersonic',0xb8d7ef,.75],['orbital',0xc7d5e8,.88]].forEach(([model,color,scale],i)=>{if((lv.aircraft[model]||0)>0){const [x,z]=fleetParking[i];planes.push(plane(x,z,scale,color,model))}});
+planes[1].rotation.y=Math.PI;rebuildPurchasedRunways();window.addEventListener('airport-runways-updated',rebuildPurchasedRunways);
 const runwayLength=54+Math.min(8,lv.runway-1)*5;
 const extraRunway=lv.runway>1?slab(0,-44,runwayLength,5,road):null;
 // runway extension markings
@@ -781,8 +785,8 @@ function resize(){const w=Math.max(1,host.clientWidth),h=Math.max(1,host.clientH
 new ResizeObserver(resize).observe(host);resize();
 let pts=new Map(),lastX=0,lastY=0,pinch=0;
 renderer.domElement.addEventListener('pointerdown',e=>{renderer.domElement.setPointerCapture(e.pointerId);pts.set(e.pointerId,{x:e.clientX,y:e.clientY});lastX=e.clientX;lastY=e.clientY;if(pts.size===2){const a=[...pts.values()];pinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)}});
-renderer.domElement.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId))return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pts.size===1){const dx=e.clientX-lastX,dy=e.clientY-lastY;theta-=dx*.006;phi=Math.max(.48,Math.min(1.32,phi+dy*.004));}else{const a=[...pts.values()],d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);if(pinch)radius=Math.max(35,Math.min(155,radius-(d-pinch)*.075));pinch=d}lastX=e.clientX;lastY=e.clientY;cam()});
-function up(e){pts.delete(e.pointerId);if(pts.size<2)pinch=0}renderer.domElement.addEventListener('pointerup',up);renderer.domElement.addEventListener('pointercancel',up);
+renderer.domElement.addEventListener('pointermove',e=>{const prev=pts.get(e.pointerId);if(!prev)return;const next={x:e.clientX,y:e.clientY};if(pts.size===1){const dx=next.x-prev.x,dy=next.y-prev.y;theta-=dx*.006;phi=Math.max(.48,Math.min(1.32,phi+dy*.004));}pts.set(e.pointerId,next);if(pts.size===2){const a=[...pts.values()],d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);if(pinch)radius=Math.max(35,Math.min(155,radius-(d-pinch)*.075));pinch=d}lastX=next.x;lastY=next.y;cam()});
+function up(e){pts.delete(e.pointerId);if(pts.size<2)pinch=0;if(pts.size===1){const p=[...pts.values()][0];lastX=p.x;lastY=p.y}}renderer.domElement.addEventListener('pointerup',up);renderer.domElement.addEventListener('pointercancel',up);
 renderer.domElement.addEventListener('wheel',e=>{radius=Math.max(35,Math.min(155,radius+e.deltaY*.04));cam()},{passive:true});
 window.addEventListener('airport-aircraft-bought',e=>{const kind=e.detail||'commuter',color=kind==='cargo'?0xf0d9a0:kind==='jet'?0xeaf4ff:0xd9edf5,scale=kind==='cargo'?.61:kind==='jet'?.68:.48;planes.push(plane(-27+(planes.length%5)*12,-5-(planes.length%2)*9,scale,color,kind))});
 window.airportCamera={zoom:d=>{radius=Math.max(35,Math.min(155,radius+d));cam()},rotate:d=>{theta+=d;cam()},reset:()=>{radius=96;theta=.78;phi=1.02;target.set(0,0,0);cam()}};
@@ -831,21 +835,16 @@ if(arrivalCycle<18){
 }else if(arrivalCycle<62){
  arrival.visible=true;arrival.position.set(12,.12,-7);arrival.rotation.y=0;arrival.rotation.z=.008*Math.sin(t*1.7);
 }else{arrival.visible=false;}
-// Высадка: пассажиры спускаются по трапу и идут к терминалу.
+// Высадка: пассажиры идут от трапа по свободной дорожке к реальному входу терминала.
 arrivalStairs.visible=arrivalCycle>=40&&arrivalCycle<62;
 arrivingPeople.forEach((p,i)=>{
  const q=p.userData,walk=arrivalCycle-42-q.offset;
  p.visible=walk>0&&walk<19;
  if(p.visible){
-  if(walk<7){
-   const u=smooth(walk/7);
-   p.position.set(16+(i-2.5)*.12,mix(2.12,.35,u),mix(-9.45,-4.8,u));
-  }else{
-   const u=smooth((walk-7)/12);
-   p.position.set(mix(16,12+(i-2.5)*.82,u),0,mix(-4.8,15,u));
-  }
-  q.legA.rotation.x=Math.sin(t*8+i)*.46;
-  q.legB.rotation.x=-Math.sin(t*8+i)*.46;
+  if(walk<7){const u=smooth(walk/7);p.position.set(16+(i-2.5)*.12,mix(2.12,.35,u),mix(-9.45,-3.4,u));}
+  else{const u=smooth((walk-7)/12);p.position.set(mix(16,-5+(i-2.5)*.55,u),0,mix(-3.4,-1.45,u));}
+  p.rotation.y=walk<7?0:Math.atan2(-21,1.95);
+  q.legA.rotation.x=Math.sin(t*5.2+i)*.24;q.legB.rotation.x=-Math.sin(t*5.2+i)*.24;
  }
 });
 // Цикл рейса: руление к гейту, стоянка и выезд на рулёжную дорожку.
@@ -924,21 +923,15 @@ baggageCarts.forEach((cart,i)=>cart.children.slice(1,4).forEach((bag,j)=>{
  const baseY=.88+(loadingBags?.13*Math.abs(Math.sin(t*3.2+i+j)):0);
  bag.position.y=baseY;
 }));
-// Посадка: пассажиры выходят из терминала и подходят к борту во время стоянки.
+// Посадка: пассажиры выходят через главный вход и идут по внешней дорожке к трапу.
 boardingPeople.forEach((p,i)=>{
- const q=p.userData,walk=serviceCycle-8-q.offset;
- p.visible=walk>0&&walk<19;
- if(p.visible){
-  const lane=gateX+(i-3)*.52;
-  if(walk<5){
-   const u=smooth(walk/5);p.position.set(mix(lane,-20.2,u),0,mix(14,-4.8,u));
-  }else if(walk<9){
-   const u=smooth((walk-5)/4);p.position.set(mix(-20.2,-20.2,u),mix(0,.35,u),mix(-4.8,-7.8,u));
-  }else{
-   const u=smooth((walk-9)/9);p.position.set(-20.2,mix(.35,2.12,u),mix(-7.8,-9.45,u));
-  }
-  q.legA.rotation.x=Math.sin(t*8+i)*.48;
-  q.legB.rotation.x=-Math.sin(t*8+i)*.48;
+ const q=p.userData,walk=serviceCycle-8-q.offset;p.visible=walk>0&&walk<19;
+ if(p.visible){const lane=-5+(i-3)*.52;
+  if(walk<6){const u=smooth(walk/6);p.position.set(mix(lane,-14,u),0,mix(-1.45,-1.8,u));}
+  else if(walk<10){const u=smooth((walk-6)/4);p.position.set(mix(-14,-20.2,u),0,mix(-1.8,-4.8,u));}
+  else{const u=smooth((walk-10)/9);p.position.set(-20.2,mix(.35,2.12,u),mix(-4.8,-9.45,u));}
+  p.rotation.y=walk<6?-Math.PI/2:Math.atan2(-6.2,-3);
+  q.legA.rotation.x=Math.sin(t*5.2+i)*.24;q.legB.rotation.x=-Math.sin(t*5.2+i)*.24;
  }
 });
 const daylight=(Math.sin(t*.035-1.2)+1)/2;const night=1-daylight;sun.intensity=.35+1.95*daylight;scene.background.setRGB(.035+.57*daylight,.075+.68*daylight,.15+.70*daylight);scene.fog.color.copy(scene.background);const weather=document.getElementById('weather');if(weather)weather.textContent=daylight>.62?'☀ ДЕНЬ · 22°':daylight<.28?'🌙 НОЧЬ · 14°':'🌆 ВЕЧЕР · 18°';lights.forEach(l=>{l.material.emissiveIntensity=.12+night*.9});cars.forEach((c,i)=>{
@@ -951,9 +944,10 @@ const daylight=(Math.sin(t*.035-1.2)+1)/2;const night=1-daylight;sun.intensity=.
  const walk=cycle-4.6;p.visible=walk>0&&walk<6.5;
  if(p.visible){const u=smooth(walk/6.5);p.position.set(slot+( -5-slot)*u,0,19+(11-19)*u);p.rotation.y=Math.atan2(-8,-5-slot);p.userData.leg1.rotation.x=Math.sin(t*9+i)*.48;p.userData.leg2.rotation.x=-Math.sin(t*9+i)*.48;}
  c.userData.wheels?.forEach(w=>{if(c.visible)w.rotation.x-=.12});
-});people.forEach((p,i)=>{const q=p.userData,phase=(t*.42+q.phase)%1;p.position.x=-25+phase*18;p.position.z=25+Math.sin(t*.8+q.phase)*1.5;q.leg1.rotation.x=Math.sin(t*7+q.phase)*.45;q.leg2.rotation.x=-Math.sin(t*7+q.phase)*.45});
+});people.forEach((p,i)=>{const q=p.userData,phase=(t*.105+q.phase*.13)%1;let x,z;if(phase<.34){const u=phase/.34;x=-30+u*6;z=18-u*16}else if(phase<.72){const u=(phase-.34)/.38;x=-24+u*19;z=2-.45*u}else{const u=(phase-.72)/.28;x=-5+u*(-25);z=1.55+u*16.45}p.position.set(x,0,z);p.rotation.y=phase<.34?Math.atan2(6,-16):phase<.72?Math.PI/2:Math.atan2(-20,14.9);q.leg1.rotation.x=Math.sin(t*4.2+q.phase)*.2;q.leg2.rotation.x=-Math.sin(t*4.2+q.phase)*.2});
 // Чемоданы движутся по ленте выдачи багажа.
-baggageBags.forEach((bag,i)=>{const phase=(t*.42+i*.2)%1;bag.position.z=2.9+phase*5.5;bag.position.x=7+Math.sin(t*1.8+i)*.08});lights.forEach((l,i)=>{l.material.emissive=new THREE.Color(0xffdf85);l.material.emissiveIntensity=.12+night*.9});if(arrivalCycle>=18&&arrivalCycle<40)arrival.userData.landingWheels?.forEach(w=>w.rotation.x+=.16);if((serviceCycle<7||(serviceCycle>=35&&serviceCycle<55))&&departing.visible)departing.userData.landingWheels?.forEach(w=>w.rotation.x+=.16);renderer.render(scene,camera);document.body.classList.add('webgl-ready')}animate();
+baggageBags.forEach((bag,i)=>{const phase=(t*.42+i*.2)%1;bag.position.z=2.9+phase*5.5;bag.position.x=7+Math.sin(t*1.8+i)*.08});// Сохраняем исходные цвета огней: красные маяки вышки не перекрашиваются в жёлтый.
+lights.forEach(l=>{if(l.material&&l.material.emissive)l.material.emissiveIntensity=.12+night*.9});if(arrivalCycle>=18&&arrivalCycle<40)arrival.userData.landingWheels?.forEach(w=>w.rotation.x+=.16);if((serviceCycle<7||(serviceCycle>=35&&serviceCycle<55))&&departing.visible)departing.userData.landingWheels?.forEach(w=>w.rotation.x+=.16);renderer.render(scene,camera);document.body.classList.add('webgl-ready')}animate();
 </script>
 
 
