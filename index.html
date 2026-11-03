@@ -872,17 +872,27 @@ baggageBags.forEach((bag,i)=>{const phase=(t*.42+i*.2)%1;bag.position.z=2.9+phas
 
 <script>
 (()=>{
- const panels=[...document.querySelectorAll('main>.panel')];
+ const main=document.querySelector('main');
+ const panels=[...main.querySelectorAll(':scope>.panel')];
+ const ids=['flightsPanel','upgradesPanel','runwayPanel','staffPanel','tasksPanel','aircraftPanel','dailyPanel'];
+ panels.forEach((p,i)=>{if(ids[i])p.id=ids[i]});
+ const addPanel=(id,title,body)=>{const p=document.createElement('section');p.className='panel';p.id=id;p.innerHTML='<h2>'+title+'</h2>'+body;main.appendChild(p);return p};
+ addPanel('hangarsPanel','🏬 АНГАРЫ','<div class="muted">Здесь будут строиться и улучшаться ангары для хранения и обслуживания самолётов. Этот раздел отделён от взлётных полос.</div><div class="upgrade" style="margin-top:10px"><div class="emoji">🏗️</div><b>Первый ангар</b><p>Отдельное строительство ангаров добавим следующим этапом.</p><button class="btn" disabled>Скоро</button></div>');
+ addPanel('shopPanel','🛒 МАГАЗИН','<div class="muted">Магазин аэропорта — отдельный раздел для будущих специальных предложений и предметов.</div><div class="upgrade" style="margin-top:10px"><div class="emoji">🎁</div><b>Ассортимент готовится</b><p>Покупка самолётов находится в разделе «Самолёты».</p><button class="btn" disabled>Скоро</button></div>');
+ addPanel('achievementsPanel','🏆 ДОСТИЖЕНИЯ','<div class="muted">Здесь будут постоянные достижения аэропорта: развитие, флот, пассажиры и обслуженные рейсы.</div><div class="upgrade" style="margin-top:10px"><div class="emoji">🥇</div><b>Первые шаги</b><p>Обслужи 5 рейсов — это задание находится отдельно в разделе «Задания».</p></div>');
+ addPanel('settingsPanel','☰ НАСТРОЙКИ','<div class="muted">Настройки управления и отображения аэропорта.</div><div class="task"><span>🎵 Музыка</span><button class="btn" id="settingsMusic">Переключить</button></div><div class="task"><span>🎥 Камера</span><button class="btn" id="settingsCamera">Сбросить</button></div>');
+ const targets=['aircraftPanel','hangarsPanel','shopPanel','upgradesPanel','achievementsPanel','settingsPanel'];
  const labels=[['🛩️','Самолёты'],['🏬','Ангары'],['🛒','Магазин'],['⚙️','Улучшения'],['🏆','Достижения'],['☰','Настройки']];
  const dock=document.createElement('nav');dock.id='gameDock';
- const sectionFor=[5,2,5,1,4,6];
- labels.forEach(([ico,label],i)=>{const b=document.createElement('button');b.className='dockBtn';b.innerHTML='<span>'+ico+'</span>'+label;b.addEventListener('click',()=>{const target=panels[sectionFor[i]];const was=target.classList.contains('active');panels.forEach(p=>p.classList.remove('active'));dock.querySelectorAll('button').forEach(x=>x.classList.remove('active'));if(!was){target.classList.add('active');b.classList.add('active');if(i===4&&window.renderAircraft)window.renderAircraft()}});dock.appendChild(b)});
+ const open=(id,button)=>{const target=document.getElementById(id);const was=target.classList.contains('active');document.querySelectorAll('main>.panel').forEach(p=>p.classList.remove('active'));dock.querySelectorAll('button').forEach(b=>b.classList.remove('active'));quick.querySelectorAll('button').forEach(b=>b.classList.remove('active'));if(!was){target.classList.add('active');button.classList.add('active');if(id==='aircraftPanel'&&window.renderAircraft)window.renderAircraft()}};
+ labels.forEach(([ico,label],i)=>{const b=document.createElement('button');b.className='dockBtn';b.innerHTML='<span>'+ico+'</span>'+label;b.addEventListener('click',()=>open(targets[i],b));dock.appendChild(b)});
  document.body.appendChild(dock);
  const quick=document.createElement('aside');quick.id='sideQuickMenu';
- [['📋','Задания',4],['👥','Персонал',3],['🛫','ВПП',2]].forEach(([ico,label,index])=>{const b=document.createElement('button');b.type='button';b.innerHTML='<span>'+ico+'</span>'+label;b.addEventListener('click',()=>{const target=panels[index];const was=target.classList.contains('active');panels.forEach(p=>p.classList.remove('active'));dock.querySelectorAll('button').forEach(x=>x.classList.remove('active'));if(!was)target.classList.add('active')});quick.appendChild(b)});document.body.appendChild(quick);
- const close=document.createElement('button');close.id='closeSheet';close.textContent='×';close.onclick=()=>{panels.forEach(p=>p.classList.remove('active'));dock.querySelectorAll('button').forEach(x=>x.classList.remove('active'))};document.body.appendChild(close);
- const observer=new MutationObserver(()=>{close.style.display=panels.some(p=>p.classList.contains('active'))?'block':'none'});panels.forEach(p=>observer.observe(p,{attributes:true,attributeFilter:['class']}));
- // Make the 3D playfield fill the phone screen and recalculate renderer size.
+ [['📋','Задания','tasksPanel'],['👥','Персонал','staffPanel'],['🛫','ВПП','runwayPanel']].forEach(([ico,label,id])=>{const b=document.createElement('button');b.type='button';b.innerHTML='<span>'+ico+'</span>'+label;b.addEventListener('click',()=>open(id,b));quick.appendChild(b)});document.body.appendChild(quick);
+ const close=document.createElement('button');close.id='closeSheet';close.textContent='×';close.onclick=()=>{document.querySelectorAll('main>.panel').forEach(p=>p.classList.remove('active'));dock.querySelectorAll('button').forEach(b=>b.classList.remove('active'));quick.querySelectorAll('button').forEach(b=>b.classList.remove('active'))};document.body.appendChild(close);
+ const observer=new MutationObserver(()=>{close.style.display=panels.concat([...main.querySelectorAll(':scope>.panel')]).some(p=>p.classList.contains('active'))?'block':'none'});main.querySelectorAll(':scope>.panel').forEach(p=>observer.observe(p,{attributes:true,attributeFilter:['class']}));
+ document.getElementById('settingsMusic').onclick=()=>document.getElementById('musicToggle').click();
+ document.getElementById('settingsCamera').onclick=()=>document.getElementById('camReset').click();
  const world=document.getElementById('threeWorld');if(world){world.style.height='100dvh';world.style.width='100vw';}
 })();
 </script>
