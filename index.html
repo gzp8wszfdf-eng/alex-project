@@ -464,9 +464,17 @@ for(let i=0;i<28;i++){const g=new THREE.Group(),tr=new THREE.Mesh(new THREE.Cyli
 function plane(x,z,scale=1,color=0xf2f4f5,model='jet'){
  const g=new THREE.Group(),landingWheels=[],body=M(color,.34),stripe=M(model==='cargo'?0xe5a83b:0x267da7,.32),engine=M(0x53616c,.55),glassCockpit=M(0x18394c,.18);
  const len=model==='cargo'?9.2:model==='commuter'?6.3:8.1,w=model==='cargo'?12:model==='commuter'?7.8:11.2;
- const fus=new THREE.Mesh(new THREE.CylinderGeometry(model==='cargo'?.58:.43,model==='cargo'?.58:.43,len,20),body);fus.rotation.x=Math.PI/2;fus.position.y=1.25;g.add(fus);
- const nose=new THREE.Mesh(new THREE.SphereGeometry(.45,18,12),body);nose.scale.set(.94,.9,1.65);nose.position.set(0,1.25,len*.47);g.add(nose);
- const tailCone=new THREE.Mesh(new THREE.ConeGeometry(.43,.9,16),body);tailCone.rotation.x=-Math.PI/2;tailCone.position.set(0,1.25,-len*.51);g.add(tailCone);
+ // Tapered fuselage: a rounded nose, full passenger cabin and narrow tail.
+ const radius=model==='cargo'?.58:.43;
+ const fuselageProfile=[
+  new THREE.Vector2(.055,-len*.53),new THREE.Vector2(radius*.48,-len*.49),
+  new THREE.Vector2(radius*.82,-len*.40),new THREE.Vector2(radius,-len*.25),
+  new THREE.Vector2(radius,len*.20),new THREE.Vector2(radius*.88,len*.36),
+  new THREE.Vector2(radius*.62,len*.45),new THREE.Vector2(.28,len*.49),
+  new THREE.Vector2(.035,len*.51)
+ ];
+ const fus=new THREE.Mesh(new THREE.LatheGeometry(fuselageProfile,24),body);
+ fus.rotation.x=Math.PI/2;fus.position.y=1.25;g.add(fus);
  const wingShape=new THREE.Shape();wingShape.moveTo(-w*.5,-.45);wingShape.lineTo(-w*.36,.55);wingShape.lineTo(w*.36,.55);wingShape.lineTo(w*.5,-.45);wingShape.lineTo(0,-.12);wingShape.closePath();
  const wing=new THREE.Mesh(new THREE.ShapeGeometry(wingShape),body);wing.rotation.x=-Math.PI/2;wing.position.set(0,1.22,-.1);g.add(wing);
  const wingBack=new THREE.Mesh(new THREE.BoxGeometry(3.1,.13,1.35),body);wingBack.position.set(0,1.26,-len*.39);g.add(wingBack);
