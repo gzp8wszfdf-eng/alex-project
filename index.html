@@ -280,6 +280,19 @@ for(let i=0;i<7;i++){
  const bag=new THREE.Mesh(new THREE.BoxGeometry(.22,.28,.13),M(0x263746));bag.position.set(.23,.62,-.04);p.add(bag);
  p.userData={offset:i*.72,legA,legB};p.visible=false;world.add(p);boardingPeople.push(p);
 }
+// Прибывшие пассажиры выходят из самолёта и направляются в терминал.
+const arrivingPeople=[];
+for(let i=0;i<6;i++){
+ const p=new THREE.Group();
+ const torso=new THREE.Mesh(new THREE.CylinderGeometry(.15,.2,.62,8),M([0x426b9a,0xe8e1d0,0x7a9b70,0xb77a45,0x735b91,0x4c9b83][i]));
+ const head=new THREE.Mesh(new THREE.SphereGeometry(.16,10,8),M(0xe5b995));
+ torso.position.y=.72;head.position.y=1.17;p.add(torso,head);
+ const legA=new THREE.Mesh(new THREE.BoxGeometry(.1,.4,.12),dark),legB=legA.clone();
+ legA.position.set(-.09,.2,0);legB.position.set(.09,.2,0);p.add(legA,legB);
+ const suitcase=new THREE.Mesh(new THREE.BoxGeometry(.3,.42,.22),M(i%2?0x263746:0x9b633d));
+ suitcase.position.set(.28,.42,.04);p.add(suitcase);
+ p.userData={offset:i*.85,legA,legB};p.visible=false;world.add(p);arrivingPeople.push(p);
+}
 const people=[];for(let i=0;i<12;i++){const p=new THREE.Group(),body=new THREE.Mesh(new THREE.CylinderGeometry(.18,.23,.72,8),M(i%3===0?0x315b91:i%3===1?0xe8e1d0:0x4c9b83)),head=new THREE.Mesh(new THREE.SphereGeometry(.19,10,8),M(0xe5b995));body.position.y=.78;head.position.y=1.28;p.add(body,head);const leg1=new THREE.Mesh(new THREE.BoxGeometry(.12,.48,.14),dark),leg2=leg1.clone();leg1.position.set(-.1,.24,0);leg2.position.set(.1,.24,0);p.add(leg1,leg2);p.userData={phase:i*.8,leg1,leg2};p.position.set(-31+(i%4)*2,0,29+Math.floor(i/4)*2);world.add(p);people.push(p)}
 // Периметр аэропорта и дальняя городская застройка на горизонте.
 for(let x=-65;x<=65;x+=5){
@@ -350,7 +363,19 @@ if(arrivalCycle<18){
  arrival.visible=true;arrival.position.set(12,.12,-7);arrival.rotation.y=0;
 }else{
  arrival.visible=false;
-}// Цикл рейса: руление к гейту, стоянка и выезд на рулёжную дорожку.
+}
+// Высадка прибывших: пассажиры с чемоданами идут от борта к терминалу.
+arrivingPeople.forEach((p,i)=>{
+ const q=p.userData,walk=arrivalCycle-42-q.offset;
+ p.visible=walk>0&&walk<19;
+ if(p.visible){
+  const progress=Math.min(1,walk/17);
+  p.position.set(12+(i-2.5)*.82,0,-4+progress*19);
+  q.legA.rotation.x=Math.sin(t*8+i)*.46;
+  q.legB.rotation.x=-Math.sin(t*8+i)*.46;
+ }
+});
+// Цикл рейса: руление к гейту, стоянка и выезд на рулёжную дорожку.
 const serviceCycle=(t%72),gateX=-24;
 const departing=planes[1];
 departing.rotation.z=0;
