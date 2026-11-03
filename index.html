@@ -30,6 +30,9 @@ main{position:static;max-width:none;margin:0;padding:0}
 
 
 /* PREMIUM AIRPORT HUD */
+/* CLEAN GAME VIEW: убрать лишние плавающие карточки */
+#empireLeft,#empireRight,#empireUpgrade{display:none!important}
+
 .empireCard{position:fixed;z-index:17;color:#f5f8ff;background:linear-gradient(145deg,rgba(8,22,39,.88),rgba(15,35,57,.78));border:1px solid rgba(220,239,255,.25);border-radius:15px;box-shadow:0 10px 30px #0005;backdrop-filter:blur(13px);-webkit-backdrop-filter:blur(13px)}
 #empireLeft{left:12px;top:calc(env(safe-area-inset-top) + 119px);width:142px;padding:12px}
 .empireLabel{font-size:9px;letter-spacing:.65px;color:#c3d6e9;font-weight:800}
