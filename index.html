@@ -149,7 +149,9 @@ const save=(()=>{try{return JSON.parse(localStorage.getItem('airportEmpireSave')
 const lv={terminal:Math.max(1,save.terminal||1),runway:Math.max(1,save.runway||1),staff:Math.max(1,save.staff||1),service:Math.max(1,save.service||1),fleet:Math.max(1,save.fleet||1),aircraft:{commuter:save.aircraft?.commuter||1,jet:save.aircraft?.jet||0,cargo:save.aircraft?.cargo||0}};
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x9bc8d8);scene.fog=new THREE.Fog(0x9bc8d8,75,150);
 const camera=new THREE.PerspectiveCamera(42,1,.1,260);
-const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;host.appendChild(renderer.domElement);document.body.classList.add('webgl-ready');
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;host.appendChild(renderer.domElement);
+window.addEventListener('error',()=>document.body.classList.remove('webgl-ready'));
+window.addEventListener('unhandledrejection',()=>document.body.classList.remove('webgl-ready'));
 scene.add(new THREE.HemisphereLight(0xe8f6ff,0x58764e,2));
 const sun=new THREE.DirectionalLight(0xfff0d5,2.2);sun.position.set(-25,48,25);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);scene.add(sun);
 const M=(c,r=.8)=>new THREE.MeshStandardMaterial({color:c,roughness:r});
@@ -454,7 +456,7 @@ boardingPeople.forEach((p,i)=>{
 });
 const daylight=(Math.sin(t*.035-1.2)+1)/2;const night=1-daylight;sun.intensity=.35+1.95*daylight;scene.background.setRGB(.035+.57*daylight,.075+.68*daylight,.15+.70*daylight);scene.fog.color.copy(scene.background);const weather=document.getElementById('weather');if(weather)weather.textContent=daylight>.62?'☀ ДЕНЬ · 22°':daylight<.28?'🌙 НОЧЬ · 14°':'🌆 ВЕЧЕР · 18°';lights.forEach(l=>{l.material.emissiveIntensity=.12+night*.9});cars.forEach((c,i)=>{const phase=(t*.13+i*.23)%1,slot=-33+i*6;c.position.x=phase<.55?-39+(slot+39)*(phase/.55):slot;c.position.z=phase<.55?31:27+(i%2)*3;c.rotation.y=phase<.55?Math.PI/2:0});people.forEach((p,i)=>{const q=p.userData,phase=(t*.42+q.phase)%1;p.position.x=-25+phase*18;p.position.z=25+Math.sin(t*.8+q.phase)*1.5;q.leg1.rotation.x=Math.sin(t*7+q.phase)*.45;q.leg2.rotation.x=-Math.sin(t*7+q.phase)*.45});
 // Чемоданы движутся по ленте выдачи багажа.
-baggageBags.forEach((bag,i)=>{const phase=(t*.42+i*.2)%1;bag.position.z=2.9+phase*5.5;bag.position.x=7+Math.sin(t*1.8+i)*.08});lights.forEach((l,i)=>{l.material.emissive=new THREE.Color(0xffdf85);l.material.emissiveIntensity=.12+night*.9});renderer.render(scene,camera)}animate();
+baggageBags.forEach((bag,i)=>{const phase=(t*.42+i*.2)%1;bag.position.z=2.9+phase*5.5;bag.position.x=7+Math.sin(t*1.8+i)*.08});lights.forEach((l,i)=>{l.material.emissive=new THREE.Color(0xffdf85);l.material.emissiveIntensity=.12+night*.9});renderer.render(scene,camera);document.body.classList.add('webgl-ready')}animate();
 </script>
 
 
