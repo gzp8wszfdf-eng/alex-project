@@ -217,7 +217,7 @@ for(let i=0;i<Math.min(7,3+lv.terminal);i++){
  box(x,2.05,-3.65,1.55,.3,.55,roof);
  box(x-.62,0,-3.6,.16,2.1,.16,dark);box(x+.62,0,-3.6,.16,2.1,.16,dark);
  const wheel=new THREE.Mesh(new THREE.CylinderGeometry(.16,.16,.18,10),dark);wheel.rotation.z=Math.PI/2;wheel.position.set(x, .18,-3.6);world.add(wheel);
- const gateSign=label;jetways.push({x});
+ jetways.push({x});
  const gateLight=new THREE.Mesh(new THREE.SphereGeometry(.17,8,6),M(0x6ce8ff,.25));gateLight.position.set(x,3,-.9);world.add(gateLight);lights.push(gateLight);
 }
 // Parking lot and cars
