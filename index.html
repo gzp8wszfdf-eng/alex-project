@@ -797,9 +797,16 @@ baggageCarts.forEach((cart,i)=>cart.children.slice(1,4).forEach((bag,j)=>{
 // Посадка: пассажиры выходят из терминала и подходят к борту во время стоянки.
 boardingPeople.forEach((p,i)=>{
  const q=p.userData,walk=serviceCycle-8-q.offset;
- p.visible=walk>0&&walk<20;
+ p.visible=walk>0&&walk<19;
  if(p.visible){
-  p.position.set(gateX+(i-3)*.72,0,14-Math.min(17,walk*.92));
+  const lane=gateX+(i-3)*.52;
+  if(walk<5){
+   const u=smooth(walk/5);p.position.set(mix(lane,-20.2,u),0,mix(14,-4.8,u));
+  }else if(walk<9){
+   const u=smooth((walk-5)/4);p.position.set(mix(-20.2,-20.2,u),mix(0,.35,u),mix(-4.8,-7.8,u));
+  }else{
+   const u=smooth((walk-9)/9);p.position.set(-20.2,mix(.35,2.12,u),mix(-7.8,-9.45,u));
+  }
   q.legA.rotation.x=Math.sin(t*8+i)*.48;
   q.legB.rotation.x=-Math.sin(t*8+i)*.48;
  }
