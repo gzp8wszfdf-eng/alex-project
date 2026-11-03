@@ -520,7 +520,7 @@ if(arrivalCycle<18){
  arrival.position.set(mix(-36,-8,u),.12,-52);arrival.rotation.y=Math.PI/2;
 }else if(arrivalCycle<40){
  const u=(arrivalCycle-28)/12;arrival.visible=true;
- arrival.position.set(mix(-8,12,u),.12,mix(-52,-7,u));arrival.rotation.y=mix(-Math.PI/2,0,u);
+ arrival.position.set(mix(-8,12,u),.12,mix(-52,-7,u));arrival.rotation.y=Math.atan2(20,45);
 }else if(arrivalCycle<62){
  arrival.visible=true;arrival.position.set(12,.12,-7);arrival.rotation.y=0;arrival.rotation.z=.008*Math.sin(t*1.7);
 }else{arrival.visible=false;}
