@@ -214,21 +214,12 @@ for(let x=-36;x<38;x+=5)slab(x,-9,.22,.42,white,.2);
 for(let z=-17;z<1;z+=4)slab(-37,z,.7,.7,yellow,.22);
 slab(-2,9,54,31,concrete);
 for(let x=-28;x<25;x+=5)slab(x,-1,.18,9,white,.22);
-// Расширенный перрон авиапарка: все видимые места находятся внутри ограждения.
-slab(0,72,138,92,concrete);
-slab(0,72,132,86,road,.12);
-for(let row=0;row<4;row++){
- const z=34+row*23;
- for(let col=0;col<6;col++){
-  const x=-55+col*22;
-  slab(x,z,18,.22,yellow,.2);
-  slab(x-9,z+1,.22,14,yellow,.2);
-  slab(x+9,z+1,.22,14,yellow,.2);
-  const stand=new THREE.Mesh(new THREE.BoxGeometry(1.1,.035,1.1),white);
-  stand.position.set(x,.22,z+7);world.add(stand);
- }
+// Четыре компактных места встроены в исходный перрон у терминала.
+for(const x of [-21,-7,7,21]){
+ slab(x,17,9,.16,yellow,.2);
+ slab(x-4.5,18,.16,3.2,yellow,.2);
+ slab(x+4.5,18,.16,3.2,yellow,.2);
 }
-slab(0,23,132,5,road,.14);slab(0,118,138,4,road,.14);
 // Огни кромки ВПП и рулёжных дорожек с мягким свечением.
 const runwayGlow=M(0xd8f3ff,.25);runwayGlow.emissive=new THREE.Color(0x9bcfff);runwayGlow.emissiveIntensity=.48;
 const taxiGlow=M(0xffd58a,.25);taxiGlow.emissive=new THREE.Color(0xffb34d);taxiGlow.emissiveIntensity=.32;
@@ -783,19 +774,20 @@ function plane(x,z,scale=1,color=0xf2f4f5,model='jet'){
  g.userData.landingWheels=landingWheels;
  g.position.set(x,0,z);g.scale.setScalar(scale);world.add(g);return g
 }
-const planes=[plane(-24,-7,.78,0xf4f6fa,'commuter'),plane(12,-7,.72,lv.fleet>=2?0xd9e9f4:0xf4f6fa,'jet'),...Array.from({length:Math.min(5,lv.fleet-1)},(_,i)=>plane(-28+i*13,17,.48,i%2?0xf0d9a0:0xe8f1fa,'commuter'))];
-// Стоянка авиапарка: 24 размеченных места на расширенном перроне.
+// Два самолёта выполняют рейсы; купленный флот отдельно размещается на стоянках.
+const planes=[plane(-24,-7,.78,0xf4f6fa,'commuter'),plane(12,-7,.72,lv.fleet>=2?0xd9e9f4:0xf4f6fa,'jet')];
 const fleetDisplay=new THREE.Group();world.add(fleetDisplay);
 const fleetModels=[
- ['commuter',0xf4f6fa,.58],['jet',0xd9e9f4,.62],['turboprop',0xeee8d5,.58],
- ['cargo',0xf0d9a0,.61],['narrow',0xeaf4ff,.68],['wide',0xdceaf4,.72],
- ['jumbo',0xf4f6fa,.78],['supersonic',0xe8f0ff,.7],['mega',0xe4edf4,.8],
- ['luxury',0xc9d8e8,.58],['ultra',0xf0f4ff,.82],['hypersonic',0xb8d7ef,.75],
- ['orbital',0xc7d5e8,.88]
+ ['commuter',0xf4f6fa,.40],['jet',0xd9e9f4,.40],['turboprop',0xeee8d5,.40],
+ ['cargo',0xf0d9a0,.40],['narrow',0xeaf4ff,.40],['wide',0xdceaf4,.38],
+ ['jumbo',0xf4f6fa,.38],['supersonic',0xe8f0ff,.40],['mega',0xe4edf4,.40],
+ ['luxury',0xc9d8e8,.40],['ultra',0xf0f4ff,.40],['hypersonic',0xb8d7ef,.40],
+ ['orbital',0xc7d5e8,.40]
 ];
-const fleetSlots=Array.from({length:24},(_,i)=>[-55+(i%6)*22,34+Math.floor(i/6)*23]);
+// На исходном перроне помещаются четыре детализированных самолёта; остальные остаются во флоте.
+const fleetSlots=[[-21,17],[-7,17],[7,17],[21,17]];
 function rebuildFleetDisplay(){
- while(fleetDisplay.children.length){const g=fleetDisplay.children.pop();g.traverse(o=>{if(o.geometry)o.geometry.dispose()})}
+ fleetDisplay.clear();
  const owned=[];
  for(const [model,color,scale] of fleetModels)for(let n=0;n<Math.max(0,lv.aircraft[model]||0);n++)owned.push({model,color,scale});
  owned.slice(0,fleetSlots.length).forEach((a,i)=>{
@@ -821,7 +813,7 @@ renderer.domElement.addEventListener('pointerdown',e=>{renderer.domElement.setPo
 renderer.domElement.addEventListener('pointermove',e=>{const prev=pts.get(e.pointerId);if(!prev)return;const next={x:e.clientX,y:e.clientY};if(pts.size===1){const dx=next.x-prev.x,dy=next.y-prev.y;theta-=dx*.006;phi=Math.max(.48,Math.min(1.32,phi+dy*.004));}pts.set(e.pointerId,next);if(pts.size===2){const a=[...pts.values()],d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);if(pinch)radius=Math.max(35,Math.min(155,radius-(d-pinch)*.075));pinch=d}lastX=next.x;lastY=next.y;cam()});
 function up(e){pts.delete(e.pointerId);if(pts.size<2)pinch=0;if(pts.size===1){const p=[...pts.values()][0];lastX=p.x;lastY=p.y}}renderer.domElement.addEventListener('pointerup',up);renderer.domElement.addEventListener('pointercancel',up);
 renderer.domElement.addEventListener('wheel',e=>{radius=Math.max(35,Math.min(155,radius+e.deltaY*.04));cam()},{passive:true});
-window.addEventListener('airport-aircraft-bought',e=>{const kind=e.detail||'commuter',color=kind==='cargo'?0xf0d9a0:kind==='jet'?0xeaf4ff:0xd9edf5,scale=kind==='cargo'?.61:kind==='jet'?.68:.48;planes.push(plane(-27+(planes.length%5)*12,-5-(planes.length%2)*9,scale,color,kind))});
+// Покупки обновляют единую стоянку через rebuildFleetDisplay; дубликаты не создаются.
 window.airportCamera={zoom:d=>{radius=Math.max(35,Math.min(155,radius+d));cam()},rotate:d=>{theta+=d;cam()},reset:()=>{radius=96;theta=.78;phi=1.02;target.set(0,0,0);cam()}};
 document.getElementById('camZoomIn').onclick=()=>window.airportCamera.zoom(-6);document.getElementById('camZoomOut').onclick=()=>window.airportCamera.zoom(6);document.getElementById('camRotate').onclick=()=>window.airportCamera.rotate(Math.PI/4);document.getElementById('camReset').onclick=()=>window.airportCamera.reset();
 // Мобильный пассажирский трап у стоянки A1.
