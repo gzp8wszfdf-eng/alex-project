@@ -701,12 +701,13 @@ function driveAirportRoute(vehicle,route,time,speed){
   legs.push({a,b,distance,travel,wait,start:total.value});total.value+=wait+travel;
  }
  const cycle=total.value,phase=((time%cycle)+cycle)%cycle;
- let leg=legs[legs.length-1],moving=false,u=0,dist=0;
- for(const item of legs){
-  const local=phase-item.start;
-  if(local<=item.wait){leg=item;u=0;moving=false;break}
-  if(local<=item.wait+item.travel){leg=item;u=(local-item.wait)/item.travel;moving=true;break}
+ let leg=legs[legs.length-1],moving=false,u=0,legIndex=legs.length-1;
+ for(let i=0;i<legs.length;i++){
+  const item=legs[i],local=phase-item.start;
+  if(local<=item.wait){leg=item;legIndex=i;u=0;moving=false;break}
+  if(local<=item.wait+item.travel){leg=item;legIndex=i;u=(local-item.wait)/item.travel;moving=true;break}
  }
+ if(vehicle.userData.routeLegIndex!==legIndex){vehicle.userData.routeLegIndex=legIndex;vehicle.userData.routeWheelDistance=0}
  const eased=u*u*(3-2*u),x=leg.a.x+(leg.b.x-leg.a.x)*eased,z=leg.a.z+(leg.b.z-leg.a.z)*eased;
  vehicle.position.set(x,moving?.012*Math.sin(time*8):0,z);
  if(moving){
@@ -714,13 +715,15 @@ function driveAirportRoute(vehicle,route,time,speed){
   const target=Math.atan2(dx,dz);
   let delta=((target-vehicle.rotation.y+Math.PI*3)%(Math.PI*2))-Math.PI;
   vehicle.rotation.y+=delta*.16;
-  dist=leg.distance*(.5-Math.cos(Math.PI*u)/2);
-  vehicle.userData.wheels?.forEach(w=>w.rotation.x-=dist*.8);
-  vehicle.userData.trailerWheels?.forEach(w=>w.rotation.x-=dist*.8);
+  const travelled=leg.distance*(.5-Math.cos(Math.PI*u)/2);
+  const wheelDelta=Math.max(0,travelled-(vehicle.userData.routeWheelDistance||0));
+  vehicle.userData.routeWheelDistance=travelled;
+  vehicle.userData.wheels?.forEach(w=>w.rotation.x-=wheelDelta*3.2);
+  vehicle.userData.trailerWheels?.forEach(w=>w.rotation.x-=wheelDelta*3.2);
   vehicle.rotation.z=Math.sin(time*2.4)*.012;
  }else{
   vehicle.rotation.z=0;
-  vehicle.userData.beacon?.material&&(vehicle.userData.beacon.material.emissiveIntensity=.35+.3*Math.sin(time*5));
+  if(vehicle.userData.beacon?.material)vehicle.userData.beacon.material.emissiveIntensity=.35+.3*Math.sin(time*5);
  }
 }
 serviceVehicles.forEach((v,i)=>driveAirportRoute(v,serviceRoutes[i],t*.82+i*2.7,[2.5,2.7,2.4,3.6,2.6,3.5,2.8,2.5][i]));
