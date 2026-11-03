@@ -475,9 +475,19 @@ function plane(x,z,scale=1,color=0xf2f4f5,model='jet'){
  ];
  const fus=new THREE.Mesh(new THREE.LatheGeometry(fuselageProfile,24),body);
  fus.rotation.x=Math.PI/2;fus.position.y=1.25;g.add(fus);
- const wingShape=new THREE.Shape();wingShape.moveTo(-w*.5,-.45);wingShape.lineTo(-w*.36,.55);wingShape.lineTo(w*.36,.55);wingShape.lineTo(w*.5,-.45);wingShape.lineTo(0,-.12);wingShape.closePath();
- const wing=new THREE.Mesh(new THREE.ShapeGeometry(wingShape),body);wing.rotation.x=-Math.PI/2;wing.position.set(0,1.22,-.1);g.add(wing);
- const wingBack=new THREE.Mesh(new THREE.BoxGeometry(3.1,.13,1.35),body);wingBack.position.set(0,1.26,-len*.39);g.add(wingBack);
+ // Swept, cambered-looking wings with visible thickness instead of a flat paper silhouette.
+ const wingShape=new THREE.Shape();
+ wingShape.moveTo(-w*.5,-.95);wingShape.lineTo(-w*.5,.82);
+ wingShape.lineTo(-w*.34,.60);wingShape.lineTo(-1.12,.18);
+ wingShape.lineTo(1.12,.18);wingShape.lineTo(w*.34,.60);
+ wingShape.lineTo(w*.5,.82);wingShape.lineTo(w*.5,-.95);
+ wingShape.lineTo(1.05,-.58);wingShape.lineTo(-1.05,-.58);wingShape.closePath();
+ const wing=new THREE.Mesh(new THREE.ExtrudeGeometry(wingShape,{depth:.16,bevelEnabled:true,bevelSegments:2,steps:1,bevelSize:.035,bevelThickness:.035}),body);
+ wing.rotation.x=-Math.PI/2;wing.position.set(0,1.13,-.1);wing.castShadow=true;wing.receiveShadow=true;g.add(wing);
+ // Horizontal stabilizer and elevator.
+ const tailShape=new THREE.Shape();tailShape.moveTo(-1.65,-.35);tailShape.lineTo(-1.35,.34);tailShape.lineTo(1.35,.34);tailShape.lineTo(1.65,-.35);tailShape.lineTo(0,-.12);tailShape.closePath();
+ const tailplane=new THREE.Mesh(new THREE.ExtrudeGeometry(tailShape,{depth:.11,bevelEnabled:true,bevelSegments:1,steps:1,bevelSize:.025,bevelThickness:.025}),body);
+ tailplane.rotation.x=-Math.PI/2;tailplane.position.set(0,1.2,-len*.39);g.add(tailplane);
  const fin=new THREE.Mesh(new THREE.ShapeGeometry(new THREE.Shape()),stripe);
  const finShape=new THREE.Shape();finShape.moveTo(0,0);finShape.lineTo(0,1.75);finShape.lineTo(1.25,.12);finShape.closePath();
  const finMesh=new THREE.Mesh(new THREE.ShapeGeometry(finShape),stripe);finMesh.position.set(0,1.25,-len*.43);g.add(finMesh);
