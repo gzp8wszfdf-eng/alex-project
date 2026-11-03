@@ -198,6 +198,34 @@ for(let x=-39;x<=39;x+=4.5){
   lamp.position.set(x,.16,z);world.add(lamp);
  }
 }
+// Дополнительная графическая детализация покрытия: бетонные швы, обочины и разметка перрона.
+const joint=M(0x879398,.95),edgePaint=M(0xf8f5e8,.72),rubberMark=M(0x303a40,1);
+for(const z of [-27,-52]){
+ for(const side of [-1,1]){
+  slab(0,z+side*8.35,92,.34,concrete,.105);
+  for(let x=-39;x<=39;x+=13)slab(x,z+side*7.95,.12,.48,joint,.19);
+ }
+ // Короткие маркировки зон торможения и осевые указатели.
+ for(let x=-40;x<=40;x+=10){
+  slab(x,z,.18,2.2,edgePaint,.205);
+ }
+}
+for(let x=-26;x<=22;x+=8){
+ for(let z=-.2;z<=17;z+=5.2)slab(x,z,.12,4.1,joint,.125);
+}
+for(let x=-27;x<=24;x+=7){
+ slab(x,16.4,3.6,.16,edgePaint,.17);
+ slab(x,17.25,3.6,.12,edgePaint,.17);
+}
+for(let i=0;i<8;i++){
+ const x=-36+i*10;
+ slab(x,-35,.75,1.7,edgePaint,.22);
+ slab(x,-60,.75,1.7,edgePaint,.22);
+}
+for(let side of [-1,1]){
+ const shoulder=new THREE.Mesh(new THREE.BoxGeometry(.22,.018,14),rubberMark);
+ shoulder.position.set(side*45,.19,-52);world.add(shoulder);
+}
 // Runway lights
 const lights=[];for(let x=-43;x<=43;x+=4){for(const z of [-60,-44,-37,-17]){const l=new THREE.Mesh(new THREE.SphereGeometry(.18,8,6),M(0xfff4b0,.25));l.position.set(x,.24,z);world.add(l);lights.push(l)}}
 // Terminal with modular wings
