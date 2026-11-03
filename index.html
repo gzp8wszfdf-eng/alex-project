@@ -149,11 +149,11 @@ const save=(()=>{try{return JSON.parse(localStorage.getItem('airportEmpireSave')
 const lv={terminal:Math.max(1,save.terminal||1),runway:Math.max(1,save.runway||1),staff:Math.max(1,save.staff||1),service:Math.max(1,save.service||1),fleet:Math.max(1,save.fleet||1),aircraft:{commuter:save.aircraft?.commuter||1,jet:save.aircraft?.jet||0,cargo:save.aircraft?.cargo||0}};
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x9bc8d8);scene.fog=new THREE.Fog(0x9bc8d8,75,150);
 const camera=new THREE.PerspectiveCamera(42,1,.1,260);
-const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;host.appendChild(renderer.domElement);
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;host.appendChild(renderer.domElement);
 window.addEventListener('error',()=>document.body.classList.remove('webgl-ready'));
 window.addEventListener('unhandledrejection',()=>document.body.classList.remove('webgl-ready'));
 scene.add(new THREE.HemisphereLight(0xe8f6ff,0x58764e,2));
-const sun=new THREE.DirectionalLight(0xfff0d5,2.2);sun.position.set(-25,48,25);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);scene.add(sun);
+const sun=new THREE.DirectionalLight(0xfff0d5,2.5);sun.position.set(-25,48,25);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-72;sun.shadow.camera.right=72;sun.shadow.camera.top=72;sun.shadow.camera.bottom=-72;sun.shadow.camera.near=1;sun.shadow.camera.far=150;sun.shadow.bias=-0.00018;sun.shadow.normalBias=.025;sun.shadow.radius=4;scene.add(sun);const fillLight=new THREE.DirectionalLight(0xb9dcff,.48);fillLight.position.set(35,22,-35);scene.add(fillLight);
 const M=(c,r=.8)=>new THREE.MeshStandardMaterial({color:c,roughness:r});
 const grass=M(0x679b68),road=M(0x424f59),concrete=M(0xb8c2c2),white=M(0xf4f1df),wall=M(0xdce5e5),glass=M(0x559db7,.3),blue=M(0x477d9a),yellow=M(0xf2bb45),dark=M(0x273846),roof=M(0x819ba5);
 function surfaceTexture(base,seed,count=900){const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d');x.fillStyle=base;x.fillRect(0,0,256,256);let n=seed;for(let i=0;i<count;i++){n=(n*1664525+1013904223)>>>0;const px=n%256;n=(n*1664525+1013904223)>>>0;const py=n%256;n=(n*1664525+1013904223)>>>0;const a=.025+(n%100)/1800;x.fillStyle=(n&1)?'rgba(255,255,255,'+a+')':'rgba(0,0,0,'+a+')';const z=1+n%3;x.fillRect(px,py,z,z)}const tex=new THREE.CanvasTexture(c);tex.wrapS=tex.wrapT=THREE.RepeatWrapping;tex.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy());return tex}
@@ -181,6 +181,23 @@ for(let x=-36;x<38;x+=5)slab(x,-9,.22,.42,white,.2);
 for(let z=-17;z<1;z+=4)slab(-37,z,.7,.7,yellow,.22);
 slab(-2,9,54,31,concrete);
 for(let x=-28;x<25;x+=5)slab(x,-1,.18,9,white,.22);
+// Огни кромки ВПП и рулёжных дорожек с мягким свечением.
+const runwayGlow=M(0xd8f3ff,.25);runwayGlow.emissive=new THREE.Color(0x9bcfff);runwayGlow.emissiveIntensity=.48;
+const taxiGlow=M(0xffd58a,.25);taxiGlow.emissive=new THREE.Color(0xffb34d);taxiGlow.emissiveIntensity=.32;
+for(const z of [-35,-60]){
+ for(let x=-43;x<=43;x+=3.2){
+  for(const side of [-1,1]){
+   const lamp=new THREE.Mesh(new THREE.SphereGeometry(.105,8,6),runwayGlow);
+   lamp.position.set(x,.17,z+side*8.8);world.add(lamp);
+  }
+ }
+}
+for(let x=-39;x<=39;x+=4.5){
+ for(const z of [-18,-1]){
+  const lamp=new THREE.Mesh(new THREE.SphereGeometry(.085,8,6),taxiGlow);
+  lamp.position.set(x,.16,z);world.add(lamp);
+ }
+}
 // Runway lights
 const lights=[];for(let x=-43;x<=43;x+=4){for(const z of [-60,-44,-37,-17]){const l=new THREE.Mesh(new THREE.SphereGeometry(.18,8,6),M(0xfff4b0,.25));l.position.set(x,.24,z);world.add(l);lights.push(l)}}
 // Terminal with modular wings
