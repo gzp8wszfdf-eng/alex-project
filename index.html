@@ -488,19 +488,19 @@ serviceVan(15,-20,0xf0f0e8,'bus');
 serviceVan(25,-20,0xe5ad39,'cart');
 serviceVan(35,-20,0xf4c04f,'cart');
 // Спецтехника рейса: топливозаправщик с цистерной и багажные платформы.
-const flightFuel=new THREE.Group();
+const flightFuel=new THREE.Group();flightFuel.userData.wheels=[];
 const fuelBase=new THREE.Mesh(new THREE.BoxGeometry(1.55,.72,3.1),M(0xe5c13b));fuelBase.position.y=.62;flightFuel.add(fuelBase);
 const tank=new THREE.Mesh(new THREE.CylinderGeometry(.52,.52,2.35,16),M(0xf1f3f4));tank.rotation.x=Math.PI/2;tank.position.set(0,1.22,-.28);flightFuel.add(tank);
 const fuelCab=new THREE.Mesh(new THREE.BoxGeometry(1.35,.78,.95),glass);fuelCab.position.set(0,1.08,1.05);flightFuel.add(fuelCab);
-for(const x of [-.62,.62])for(const z of [-.95,.95]){const w=new THREE.Mesh(new THREE.CylinderGeometry(.22,.22,.14,10),dark);w.rotation.z=Math.PI/2;w.position.set(x,.22,z);flightFuel.add(w)}
+for(const x of [-.62,.62])for(const z of [-.95,.95]){const w=new THREE.Mesh(new THREE.CylinderGeometry(.22,.22,.14,12),dark);w.rotation.z=Math.PI/2;w.position.set(x,.22,z);flightFuel.add(w);flightFuel.userData.wheels.push(w)}
 world.add(flightFuel);
-const baggageTrain=new THREE.Group();
+const baggageTrain=new THREE.Group();baggageTrain.userData.wheels=[];
 const tug=new THREE.Mesh(new THREE.BoxGeometry(1.2,.65,1.65),M(0xe9ad35));tug.position.set(0,.58,1.45);baggageTrain.add(tug);
-const tugCab=new THREE.Mesh(new THREE.BoxGeometry(1,.65,.85),glass);tugCab.position.set(0,1.05,1.85);baggageTrain.add(tugCab);
+const tugCab=new THREE.Mesh(new THREE.BoxGeometry(1,.65,.85),glass);tugCab.position.set(0,1.05,1.85);baggageTrain.add(tugCab);\nfor(const x of [-.48,.48])for(const z of [.85,2.0]){const w=new THREE.Mesh(new THREE.CylinderGeometry(.2,.2,.13,12),dark);w.rotation.z=Math.PI/2;w.position.set(x,.22,z);baggageTrain.add(w);baggageTrain.userData.wheels.push(w)}
 for(let n=0;n<2;n++){
  const cart=new THREE.Group(),base=new THREE.Mesh(new THREE.BoxGeometry(1.45,.22,1.75),M(0x596b78));base.position.y=.55;cart.add(base);
  for(const x of [-.48,.0,.48]){const bag=new THREE.Mesh(new THREE.BoxGeometry(.38,.48,.48),M(n?0x315b91:0xb16c42));bag.position.set(x,.88,0);cart.add(bag)}
- for(const x of [-.56,.56])for(const z of [-.58,.58]){const w=new THREE.Mesh(new THREE.CylinderGeometry(.15,.15,.12,8),dark);w.rotation.z=Math.PI/2;w.position.set(x,.2,z);cart.add(w)}
+ for(const x of [-.56,.56])for(const z of [-.58,.58]){const w=new THREE.Mesh(new THREE.CylinderGeometry(.15,.15,.12,10),dark);w.rotation.z=Math.PI/2;w.position.set(x,.2,z);cart.add(w);baggageTrain.userData.wheels.push(w)}
  cart.position.z=-.9-n*2.1;baggageTrain.add(cart);
 }
 world.add(baggageTrain);
@@ -743,15 +743,11 @@ function driveAirportRoute(vehicle,route,time,speed){
  }
 }
 serviceVehicles.forEach((v,i)=>driveAirportRoute(v,serviceRoutes[i],t*.82+i*2.7,[2.5,2.7,2.4,3.6,2.6,3.5,2.8,2.5][i]));
-// Топливо и багаж обслуживают именно тот самолёт, который стоит у гейта.
-const fuelActive=serviceCycle>12&&serviceCycle<29;
-flightFuel.visible=fuelActive;
-flightFuel.position.set(fuelActive?-14.8:-38,0,fuelActive?-7.8:-20);
-flightFuel.rotation.y=Math.PI/2;
-const baggageActive=serviceCycle>9&&serviceCycle<25;
-baggageTrain.visible=baggageActive;
-baggageTrain.position.set(baggageActive?-33.5:-42,0,baggageActive?-7.5:-20);
-baggageTrain.rotation.y=Math.PI/2;
+// Отдельные спецмашины выполняют полный цикл: выезд, обслуживание самолёта и возвращение.
+flightFuel.visible=true;
+driveAirportRoute(flightFuel,[{x:-38,z:-20},{x:-32,z:-18},{x:-24,z:-13},{x:-15,z:-8,wait:10},{x:-22,z:-13},{x:-31,z:-18}],t*.58,2.1);
+baggageTrain.visible=true;
+driveAirportRoute(baggageTrain,[{x:-42,z:-20},{x:-39,z:-15},{x:-35,z:-11,wait:5},{x:-31,z:-8,wait:8},{x:-35,z:-13},{x:-42,z:-20}],t*.62,2.35);
 // Посадка: пассажиры выходят из терминала и подходят к борту во время стоянки.
 boardingPeople.forEach((p,i)=>{
  const q=p.userData,walk=serviceCycle-8-q.offset;
