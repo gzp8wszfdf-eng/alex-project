@@ -157,7 +157,7 @@ const clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);
 <script>
 (()=>{
  const panels=[...document.querySelectorAll('main>.panel')];
- const labels=[['✈️','Рейсы'],['🏗️','Здания'],['👥','Персонал'],['🛩️','Авиапарк'],['📋','Задания'],['🎁','Бонус']];
+ const labels=[['✈️','Рейсы'],['🏗️','Здания'],['👥','Персонал'],['📋','Задания'],['🛩️','Авиапарк'],['🎁','Бонус']];
  const dock=document.createElement('nav');dock.id='gameDock';
  const sectionFor=[0,1,2,3,4,5];
  labels.forEach(([ico,label],i)=>{const b=document.createElement('button');b.className='dockBtn';b.innerHTML='<span>'+ico+'</span>'+label;b.addEventListener('click',()=>{const target=panels[sectionFor[i]];const was=target.classList.contains('active');panels.forEach(p=>p.classList.remove('active'));dock.querySelectorAll('button').forEach(x=>x.classList.remove('active'));if(!was){target.classList.add('active');b.classList.add('active')}});dock.appendChild(b)});
