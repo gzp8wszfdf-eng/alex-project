@@ -408,10 +408,17 @@ function buildCar(color=0x2f82b8,type='sedan'){
  const backBumper=bumper.clone();backBumper.position.z=-1.2;g.add(backBumper);
  g.userData.wheels=wheels;return g;
 }
-const cars=[];for(let i=0;i<Math.min(3+lv.staff,10);i++){const g=buildCar(i%3===0?0xf2f4f6:i%3===1?0x267da7:0xe2ad3c,i%4===0?'van':'sedan');g.position.set(-34+i*4,0,31+(i%2)*3);world.add(g);cars.push(g)}
-// Равномерно пройденная дистанция по овальной дороге: машины не ускоряются на прямых и не замедляются в поворотах.
-const roadPath=(()=>{const rx=15.4,rz=5.1,n=720,points=[];let total=0,prev=null;for(let i=0;i<=n;i++){const a=i/n*Math.PI*2,p={a,x:-20+Math.cos(a)*rx,z:31+Math.sin(a)*rz};if(prev)total+=Math.hypot(p.x-prev.x,p.z-prev.z);p.length=total;points.push(p);prev=p}return{points,total}})();
-function roadPose(distance){const d=((distance%roadPath.total)+roadPath.total)%roadPath.total,pts=roadPath.points;let lo=0,hi=pts.length-1;while(lo+1<hi){const mid=(lo+hi)>>1;if(pts[mid].length<d)lo=mid;else hi=mid}const p=pts[lo],q=pts[hi],u=(d-p.length)/Math.max(.0001,q.length-p.length),a=p.a+(q.a-p.a)*u;return{x:-20+Math.cos(a)*15.4,z:31+Math.sin(a)*5.1,dx:-Math.sin(a)*15.4,dz:Math.cos(a)*5.1}}
+// Автомобили у терминала: подъезд, парковка, высадка пассажира и выезд.
+const cars=[],curbPassengers=[];
+for(let i=0;i<4;i++){
+ const car=buildCar([0xf2f4f6,0x267da7,0xe2ad3c,0x526b80][i],i===1?'van':'sedan');
+ car.visible=false;world.add(car);cars.push(car);
+ const person=new THREE.Group(),coat=new THREE.Mesh(new THREE.CylinderGeometry(.14,.19,.58,9),M([0x315b91,0xe8e1d0,0x4c9b83,0xb77a45][i])),head=new THREE.Mesh(new THREE.SphereGeometry(.145,10,8),M(0xe5b995));
+ const leg1=new THREE.Mesh(new THREE.BoxGeometry(.09,.36,.11),dark),leg2=leg1.clone();
+ coat.position.y=.69;head.position.y=1.08;leg1.position.set(-.075,.18,0);leg2.position.set(.075,.18,0);person.add(coat,head,leg1,leg2);
+ person.userData={leg1,leg2};person.visible=false;world.add(person);curbPassengers.push(person);
+}
+const curbSlots=[-15,-10,-5,0];
 // Пассажиры рейса: отдельная группа идёт от терминала к выходу A1.
 const boardingPeople=[];
 for(let i=0;i<7;i++){
@@ -503,17 +510,17 @@ window.airportCamera={zoom:d=>{radius=Math.max(27,Math.min(100,radius+d));cam()}
 document.getElementById('camZoomIn').onclick=()=>window.airportCamera.zoom(-6);document.getElementById('camZoomOut').onclick=()=>window.airportCamera.zoom(6);document.getElementById('camRotate').onclick=()=>window.airportCamera.rotate(Math.PI/4);document.getElementById('camReset').onclick=()=>window.airportCamera.reset();
 const clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();const smooth=u=>{u=Math.max(0,Math.min(1,u));return u*u*(3-2*u)};const mix=(a,b,u)=>a+(b-a)*smooth(u);// Прилёт: заход, касание полосы, пробег и руление к стоянке.
 const arrivalCycle=t%72,arrival=planes[0];
-arrival.rotation.z=0;arrival.rotation.y=Math.PI/2;
+arrival.rotation.z=0;arrival.rotation.y=-Math.PI/2;
 if(arrivalCycle<18){
  const u=arrivalCycle/18;arrival.visible=true;
  arrival.position.set(mix(44,-36,u),mix(11,.12,u),-52);
- arrival.rotation.y=Math.PI/2;arrival.rotation.z=-.035*Math.sin(u*Math.PI);
+ arrival.rotation.y=-Math.PI/2;arrival.rotation.z=-.012*Math.sin(u*Math.PI);
 }else if(arrivalCycle<28){
  const u=(arrivalCycle-18)/10;arrival.visible=true;
- arrival.position.set(mix(-36,-8,u),.12,-52);arrival.rotation.y=Math.PI/2;
+ arrival.position.set(mix(-36,-8,u),.12,-52);arrival.rotation.y=-Math.PI/2;
 }else if(arrivalCycle<40){
  const u=(arrivalCycle-28)/12;arrival.visible=true;
- arrival.position.set(mix(-8,12,u),.12,mix(-52,-7,u));arrival.rotation.y=mix(Math.PI/2,0,u);
+ arrival.position.set(mix(-8,12,u),.12,mix(-52,-7,u));arrival.rotation.y=mix(-Math.PI/2,0,u);
 }else if(arrivalCycle<62){
  arrival.visible=true;arrival.position.set(12,.12,-7);arrival.rotation.y=0;arrival.rotation.z=.008*Math.sin(t*1.7);
 }else{arrival.visible=false;}
@@ -563,7 +570,17 @@ boardingPeople.forEach((p,i)=>{
   q.legB.rotation.x=-Math.sin(t*8+i)*.48;
  }
 });
-const daylight=(Math.sin(t*.035-1.2)+1)/2;const night=1-daylight;sun.intensity=.35+1.95*daylight;scene.background.setRGB(.035+.57*daylight,.075+.68*daylight,.15+.70*daylight);scene.fog.color.copy(scene.background);const weather=document.getElementById('weather');if(weather)weather.textContent=daylight>.62?'☀ ДЕНЬ · 22°':daylight<.28?'🌙 НОЧЬ · 14°':'🌆 ВЕЧЕР · 18°';lights.forEach(l=>{l.material.emissiveIntensity=.12+night*.9});cars.forEach((c,i)=>{const speed=2.05+Math.sin(t*.22+i*1.7)*.035,pose=roadPose(t*speed+i*roadPath.total/Math.max(1,cars.length));c.position.set(pose.x,.018+Math.sin(t*3.2+i*1.9)*.012,pose.z);c.rotation.y=Math.atan2(-pose.dz,pose.dx);c.userData.wheels?.forEach(w=>w.rotation.x-=speed*.24)});people.forEach((p,i)=>{const q=p.userData,phase=(t*.42+q.phase)%1;p.position.x=-25+phase*18;p.position.z=25+Math.sin(t*.8+q.phase)*1.5;q.leg1.rotation.x=Math.sin(t*7+q.phase)*.45;q.leg2.rotation.x=-Math.sin(t*7+q.phase)*.45});
+const daylight=(Math.sin(t*.035-1.2)+1)/2;const night=1-daylight;sun.intensity=.35+1.95*daylight;scene.background.setRGB(.035+.57*daylight,.075+.68*daylight,.15+.70*daylight);scene.fog.color.copy(scene.background);const weather=document.getElementById('weather');if(weather)weather.textContent=daylight>.62?'☀ ДЕНЬ · 22°':daylight<.28?'🌙 НОЧЬ · 14°':'🌆 ВЕЧЕР · 18°';lights.forEach(l=>{l.material.emissiveIntensity=.12+night*.9});cars.forEach((c,i)=>{
+ const cycle=((t-i*4.2)%22+22)%22,slot=curbSlots[i],p=curbPassengers[i];
+ const smooth=u=>{u=Math.max(0,Math.min(1,u));return u*u*(3-2*u)};
+ if(cycle<6){const u=smooth(cycle/6);c.visible=true;c.position.set(-38+(slot+38)*u,.018,19);c.rotation.y=Math.PI/2;}
+ else if(cycle<10){c.visible=true;c.position.set(slot,.018,19);c.rotation.y=Math.PI/2;}
+ else if(cycle<17){const u=smooth((cycle-10)/7);c.visible=true;c.position.set(slot+(38-slot)*u,.018,19);c.rotation.y=Math.PI/2;}
+ else c.visible=false;
+ const walk=cycle-7.2;p.visible=walk>0&&walk<6.5;
+ if(p.visible){const u=smooth(walk/6.5);p.position.set(slot+( -5-slot)*u,0,19+(11-19)*u);p.rotation.y=Math.atan2(-8,-5-slot);p.userData.leg1.rotation.x=Math.sin(t*9+i)*.48;p.userData.leg2.rotation.x=-Math.sin(t*9+i)*.48;}
+ c.userData.wheels?.forEach(w=>{if(c.visible)w.rotation.x-=.12});
+});people.forEach((p,i)=>{const q=p.userData,phase=(t*.42+q.phase)%1;p.position.x=-25+phase*18;p.position.z=25+Math.sin(t*.8+q.phase)*1.5;q.leg1.rotation.x=Math.sin(t*7+q.phase)*.45;q.leg2.rotation.x=-Math.sin(t*7+q.phase)*.45});
 // Чемоданы движутся по ленте выдачи багажа.
 baggageBags.forEach((bag,i)=>{const phase=(t*.42+i*.2)%1;bag.position.z=2.9+phase*5.5;bag.position.x=7+Math.sin(t*1.8+i)*.08});lights.forEach((l,i)=>{l.material.emissive=new THREE.Color(0xffdf85);l.material.emissiveIntensity=.12+night*.9});if(arrivalCycle>=18&&arrivalCycle<40)arrival.userData.landingWheels?.forEach(w=>w.rotation.x+=.16);if((serviceCycle<7||(serviceCycle>=35&&serviceCycle<55))&&departing.visible)departing.userData.landingWheels?.forEach(w=>w.rotation.x+=.16);renderer.render(scene,camera);document.body.classList.add('webgl-ready')}animate();
 </script>
