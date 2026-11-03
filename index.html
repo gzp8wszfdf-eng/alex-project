@@ -28,8 +28,50 @@ main{position:static;max-width:none;margin:0;padding:0}
 .toast{bottom:calc(78px + env(safe-area-inset-bottom));z-index:60}
 @media(min-width:700px){.panel{left:auto;right:18px;width:390px;max-height:55dvh;bottom:85px}#gameDock{left:50%;right:auto;transform:translateX(-50%);width:min(520px,100%);border-radius:18px 18px 0 0}.scenehead{top:115px;left:24px;width:280px}}
 
+
+/* PREMIUM AIRPORT HUD */
+.empireCard{position:fixed;z-index:17;color:#f5f8ff;background:linear-gradient(145deg,rgba(8,22,39,.88),rgba(15,35,57,.78));border:1px solid rgba(220,239,255,.25);border-radius:15px;box-shadow:0 10px 30px #0005;backdrop-filter:blur(13px);-webkit-backdrop-filter:blur(13px)}
+#empireLeft{left:12px;top:calc(env(safe-area-inset-top) + 119px);width:142px;padding:12px}
+.empireLabel{font-size:9px;letter-spacing:.65px;color:#c3d6e9;font-weight:800}
+#empireLeft strong{display:block;font-size:22px;line-height:1.25;margin-top:3px;text-shadow:0 2px 8px #0007}
+.empireDivider{height:1px;background:#ffffff20;margin:9px 0}
+#empireLeft .empireGreen{color:#68e6a5;font-size:18px}
+#empireRight{right:12px;top:calc(env(safe-area-inset-top) + 119px);width:164px;padding:12px}
+.empireNotice{font-size:9px;color:#ffd47b;font-weight:900;letter-spacing:.5px;margin-bottom:6px}
+#empireRight b{font-size:12px;display:block}
+#empireRight>span{display:block;color:#c2d2e1;font-size:10px;line-height:1.35;margin:5px 0 9px}
+#empireRight button,#empireUpgrade button{border:0;border-radius:9px;background:linear-gradient(135deg,#43d58c,#159b65);color:#052d20;font-weight:900;font-size:10px;padding:9px 11px;box-shadow:0 4px 14px #1bba7655}
+.empireFeatures{display:grid;gap:5px;margin-top:10px;padding-top:8px;border-top:1px solid #ffffff20;color:#d8e8f7;font-size:9px}
+#empireUpgrade{left:12px;bottom:calc(83px + env(safe-area-inset-bottom));width:min(310px,calc(100vw - 24px));padding:9px;display:flex;align-items:center;gap:9px}
+.empireUpgradeThumb{width:52px;height:52px;flex:0 0 52px;border-radius:10px;background:linear-gradient(145deg,#477fa0,#172f49);display:grid;place-items:center;font-size:27px}
+.empireUpgradeText{min-width:0;flex:1}
+.empireUpgradeText b,.empireUpgradeText span,.empireUpgradeText small{display:block}
+.empireUpgradeText b{font-size:9px;letter-spacing:.3px}
+.empireUpgradeText span{font-size:9px;color:#d1e0ee;margin-top:3px}
+.empireUpgradeText small{font-size:8px;color:#f3c66c;margin-top:3px}
+#empireUpgrade button{padding:9px 8px;white-space:nowrap}
+@media(max-width:390px){#empireLeft{width:126px;padding:10px}#empireRight{width:145px;padding:10px}.empireLabel{font-size:8px}#empireLeft strong{font-size:19px}#empireRight>span{font-size:9px}#empireUpgrade{width:calc(100vw - 24px)}}
+@media(min-width:700px){#empireLeft{left:22px;top:145px;width:190px;padding:16px}#empireRight{right:22px;top:145px;width:220px;padding:16px}#empireUpgrade{left:22px;bottom:95px;width:360px}}
 </style></head><body>
 <header><div class="top"><div><div class="logo">✈ IDLE AIRPORT EMPIRE</div><div class="muted">Построй аэропорт мирового уровня</div></div><span class="tag" id="levelTag">УРОВЕНЬ 1</span></div><div class="stats"><div class="stat"><small>💰 Деньги</small><b class="gold" id="money">500</b></div><div class="stat"><small>📈 Доход / мин</small><b id="income">12</b></div><div class="stat"><small>🧍 Пассажиры</small><b id="pax">24</b></div></div></header>
+<div id="empireLeft" class="empireCard">
+ <div class="empireLabel">✈ РЕЙСЫ СЕГОДНЯ</div><strong id="hudFlights">08</strong>
+ <div class="empireDivider"></div>
+ <div class="empireLabel">👥 ПАССАЖИРЫ</div><strong id="hudPassengers">24</strong>
+ <div class="empireDivider"></div>
+ <div class="empireLabel">💰 ПРИБЫЛЬ</div><strong class="empireGreen" id="hudProfit">+12 / мин</strong>
+</div>
+<div id="empireRight" class="empireCard">
+ <div class="empireNotice">✦ ДОСТУПНО УЛУЧШЕНИЕ</div>
+ <b>Расширение аэропорта</b>
+ <span>Новые выходы на посадку и больше рейсов</span>
+ <button id="hudBuild" type="button">РАЗВИВАТЬ ↗</button>
+ <div class="empireFeatures"><span>☀ День / ночь</span><span>✈ Две ВПП</span><span>◉ 3D-камера</span></div>
+</div>
+<div id="empireUpgrade" class="empireCard">
+ <div class="empireUpgradeThumb">🏢</div><div class="empireUpgradeText"><b>УЛУЧШИТЬ ТЕРМИНАЛ</b><span>Увеличь поток пассажиров</span><small>Инвестиции в развитие</small></div>
+ <button id="hudTerminal" type="button">ОТКРЫТЬ</button>
+</div>
 <main><section class="scene"><div class="scenehead"><b>🌍 ТВОЙ АЭРОПОРТ</b><span id="weather">☀ ЯСНО · 22°</span></div><div id="threeWorld" style="width:100%;height:360px;touch-action:none"></div><canvas id="world" width="900" height="570" style="display:none"></canvas><div class="legend"><span><i class="dot" style="background:#51d9b1"></i>Терминал</span><span><i class="dot" style="background:#aab7c8"></i>ВПП</span><span><i class="dot" style="background:#ffc85a"></i>Самолёт</span><span>✦ Объекты оживают со временем</span></div></section>
 <div class="xp"><div class="xphead"><span>РЕПУТАЦИЯ АЭРОПОРТА</span><b id="xptext">0 / 100 XP</b></div><div class="bar"><i id="xpbar"></i></div></div>
 <section class="panel"><div class="row"><h2>🛫 РЕЙСЫ И АВИАКОМПАНИИ</h2><span class="muted" id="flightCount">0 рейсов</span></div><div class="flight"><div class="planeicon">🛩️</div><div class="flightinfo"><b>Региональный рейс · A-101</b><small id="flightState">Самолёт готов к посадке</small></div><button class="btn green" id="dispatch">Обслужить · +35</button></div><div class="muted">Обслуживай рейсы, зарабатывай и открывай новые возможности.</div></section>
@@ -182,6 +224,18 @@ document.getElementById('camZoomIn').onclick=()=>window.airportCamera.zoom(-6);d
 const clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();planes[0].position.x=-40+(t*3.4%80);planes[0].position.z=-52;planes[0].rotation.y=Math.PI/2;planes[1].position.y=0.03*Math.sin(t*2);const daylight=(Math.sin(t*.035-1.2)+1)/2;const night=1-daylight;sun.intensity=.35+1.95*daylight;scene.background.setRGB(.035+.57*daylight,.075+.68*daylight,.15+.70*daylight);scene.fog.color.copy(scene.background);const weather=document.getElementById('weather');if(weather)weather.textContent=daylight>.62?'☀ ДЕНЬ · 22°':daylight<.28?'🌙 НОЧЬ · 14°':'🌆 ВЕЧЕР · 18°';lights.forEach(l=>{l.material.emissiveIntensity=.12+night*.9});cars.forEach((c,i)=>{const phase=(t*.13+i*.23)%1,slot=-33+i*6;c.position.x=phase<.55?-39+(slot+39)*(phase/.55):slot;c.position.z=phase<.55?31:27+(i%2)*3;c.rotation.y=phase<.55?Math.PI/2:0});people.forEach((p,i)=>{const q=p.userData,phase=(t*.42+q.phase)%1;p.position.x=-25+phase*18;p.position.z=25+Math.sin(t*.8+q.phase)*1.5;q.leg1.rotation.x=Math.sin(t*7+q.phase)*.45;q.leg2.rotation.x=-Math.sin(t*7+q.phase)*.45});lights.forEach((l,i)=>{l.material.emissive=new THREE.Color(0xffdf85);l.material.emissiveIntensity=.12+night*.9});renderer.render(scene,camera)}animate();
 </script>
 
+<script>
+
+// Premium HUD actions and live values
+(()=>{
+ const byId=id=>document.getElementById(id);
+ const money=byId('money'),income=byId('income'),pax=byId('pax');
+ const copy=()=>{if(money)byId('hudProfit').textContent='+'+(income?.textContent||'12')+' / мин';if(pax)byId('hudPassengers').textContent=pax.textContent;if(money)byId('hudProfit').title='Баланс: '+money.textContent};
+ const obs=new MutationObserver(copy);[money,income,pax].filter(Boolean).forEach(el=>obs.observe(el,{childList:true,characterData:true,subtree:true}));copy();
+ byId('hudBuild').addEventListener('click',()=>document.querySelectorAll('#gameDock .dockBtn')[1]?.click());
+ byId('hudTerminal').addEventListener('click',()=>document.querySelectorAll('#gameDock .dockBtn')[1]?.click());
+})();
+</script>
 <script>
 (()=>{
  const panels=[...document.querySelectorAll('main>.panel')];
