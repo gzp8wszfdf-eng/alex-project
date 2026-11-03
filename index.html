@@ -357,6 +357,70 @@ box(16.7,15,5,8.2,.35,8.2,dark);
 box(16.7,15.38,5,2.2,.35,2.2,yellow);
 const antenna=new THREE.Mesh(new THREE.CylinderGeometry(.035,.06,3.2,8),dark);antenna.position.set(16.7,17.1,5);world.add(antenna);
 const beacon=new THREE.Mesh(new THREE.SphereGeometry(.2,10,8),M(0xff5148,.25));beacon.position.set(16.7,18.8,5);world.add(beacon);lights.push(beacon);
+// CONTROL TOWER UPGRADE — detailed cab, structural supports, consoles and communication equipment.
+const towerDetails=new THREE.Group();world.add(towerDetails);
+const towerSteel=M(0x344b5c,.48),towerGlass=M(0x163d55,.2),towerGlassLit=M(0x65b7d0,.24),towerMetal=M(0x9aaeb8,.55),towerWarm=M(0xffd78a,.3);
+// Reinforced tower shaft with vertical corner ribs and intermediate service bands.
+for(const sx of [-1,1])for(const sz of [-1,1]){
+ const rib=box(16.7+sx*2.42,.35,5+sz*2.42,.18,12.2,.18,towerSteel,towerDetails);
+}
+for(let y of [3.4,7.1,10.8]){
+ box(16.7,y,5,5.35,.2,5.35,towerMetal,towerDetails);
+}
+// Panoramic glazed control cab with four slanted-looking framed faces.
+box(16.7,13.55,5,8.05,.12,8.05,towerSteel,towerDetails);
+for(let side=0;side<4;side++){
+ const pane=box(16.7,14.18,5,7.35,1.15,.12,towerGlass,towerDetails);
+ pane.rotation.y=side*Math.PI/2;
+ const mullion=box(16.7,14.18,5, .12,1.22,.16,towerMetal,towerDetails);
+ mullion.rotation.y=side*Math.PI/2;
+}
+box(16.7,14.78,5,8.45,.22,8.45,towerSteel,towerDetails);
+box(16.7,15.05,5,7.95,.16,7.95,towerMetal,towerDetails);
+// Roof platform, equipment cabinets and radio antenna cluster.
+box(16.7,15.28,5,8.25,.22,8.25,towerSteel,towerDetails);
+for(let i=0;i<4;i++){
+ const x=13.8+i*1.9;
+ box(x,15.62,7.55,1.15,.52,1.05,towerMetal,towerDetails);
+ box(x,15.92,7.55,.78,.08,.72,towerSteel,towerDetails);
+}
+for(let i=0;i<3;i++){
+ const ant=new THREE.Mesh(new THREE.CylinderGeometry(.035,.055,2.6+i*.45,8),towerSteel);
+ ant.position.set(14.2+i*2.2,17.05+i*.2,3.7);towerDetails.add(ant);
+}
+const dish=new THREE.Mesh(new THREE.SphereGeometry(.62,14,10,0,Math.PI*2,0,Math.PI/2),towerMetal);
+dish.position.set(19.5,16.3,6.8);dish.rotation.x=Math.PI; towerDetails.add(dish);
+// Interior control consoles visible through the panoramic glass.
+for(let i=0;i<4;i++){
+ const x=14.3+i*1.55;
+ box(x,13.78,3.55,1.25,.42,.42,towerSteel,towerDetails);
+ box(x,14.04,3.48,.92,.16,.08,towerGlassLit,towerDetails);
+ const display=box(x,14.35,3.78,.68,.42,.07,towerGlassLit,towerDetails);
+ display.rotation.x=-.18;
+}
+for(let x=13.2;x<=20.2;x+=1.15){
+ const glow=new THREE.Mesh(new THREE.BoxGeometry(.55,.045,.08),towerWarm);
+ glow.position.set(x,15.12,.92);towerDetails.add(glow);lights.push(glow);
+}
+// Perimeter warning lights on cab roof and mast.
+for(const [x,z] of [[12.7,1],[20.7,1],[12.7,9],[20.7,9]]){
+ const red=new THREE.Mesh(new THREE.SphereGeometry(.17,10,8),M(0xff342e,.22));
+ red.material.emissive=new THREE.Color(0xff1712);red.material.emissiveIntensity=1.25;
+ red.position.set(x,15.55,z);towerDetails.add(red);lights.push(red);
+}
+const mastBeacon=new THREE.Mesh(new THREE.SphereGeometry(.2,10,8),M(0xff3028,.2));
+mastBeacon.material.emissive=new THREE.Color(0xff160f);mastBeacon.material.emissiveIntensity=1.4;
+mastBeacon.position.set(16.7,18.65,5);towerDetails.add(mastBeacon);lights.push(mastBeacon);
+// External maintenance ladder and access landing.
+for(const x of [19.55,20.05]){
+ const rail=new THREE.Mesh(new THREE.CylinderGeometry(.055,.055,12.2,8),towerMetal);
+ rail.position.set(x,6.5,7.65);towerDetails.add(rail);
+}
+for(let y=.8;y<12.5;y+=.65){
+ const rung=new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,.62,8),towerMetal);
+ rung.rotation.z=Math.PI/2;rung.position.set(19.8,y,7.65);towerDetails.add(rung);
+}
+
 // Hangars and service buildings unlock with service upgrades
 box(29,0,13,14,4,12,wall);box(29,4,13,14,.7,12,yellow);
 for(let i=0;i<Math.min(6,lv.service-1);i++){const x=30+(i%3)*11,z=29+Math.floor(i/3)*12;box(x,0,z,8,4,8,wall);box(x,4,z,8,.5,8,roof);box(x,1,z-4.08,4,2.2,.12,blue)}
