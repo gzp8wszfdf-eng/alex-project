@@ -733,7 +733,7 @@ for(let x=-65;x<=65;x+=5){
 for(let i=0;i<28;i++){const g=new THREE.Group(),tr=new THREE.Mesh(new THREE.CylinderGeometry(.14,.2,1.1,7),M(0x76553b)),top=new THREE.Mesh(new THREE.SphereGeometry(.9,8,7),M(i%2?0x368458:0x4b9a62));tr.position.y=.55;top.position.y=1.55;g.add(tr,top);g.position.set(-48+(i%14)*7,0,119+Math.floor(i/14)*7);world.add(g)}
 function plane(x,z,scale=1,color=0xf2f4f5,model='jet'){
  const g=new THREE.Group(),landingWheels=[],body=M(color,.34),stripe=M(model==='cargo'?0xe5a83b:0x267da7,.32),engine=M(0x53616c,.55),glassCockpit=M(0x18394c,.18);
- const specs={commuter:[6.3,7.8],turboprop:[6.8,8.4],cargo:[9.2,12],jet:[8.1,11.2],narrow:[10.2,13.5],wide:[12.8,17],jumbo:[15.5,20],supersonic:[13.2,12.5]};const [len,w]=specs[model]||specs.jet;
+ const specs={commuter:[6.3,7.8],turboprop:[6.8,8.4],cargo:[9.2,12],jet:[8.1,11.2],narrow:[10.2,13.5],wide:[12.8,17],jumbo:[15.5,20],supersonic:[13.2,12.5],mega:[18,22.5],luxury:[6.4,7.2],ultra:[16.8,21],hypersonic:[11.5,14],orbital:[17.5,19]};const [len,w]=specs[model]||specs.jet;
  // Tapered fuselage: a rounded nose, full passenger cabin and narrow tail.
  const radius=model==='cargo'?.58:.43;
  const fuselageProfile=[
@@ -763,17 +763,24 @@ function plane(x,z,scale=1,color=0xf2f4f5,model='jet'){
  const finMesh=new THREE.Mesh(new THREE.ShapeGeometry(finShape),stripe);finMesh.position.set(0,1.25,-len*.43);g.add(finMesh);
  for(const side of [-1,1]){
   const winglet=new THREE.Mesh(new THREE.BoxGeometry(.12,.65,.45),stripe);winglet.position.set(side*w*.46,1.48,-.08);g.add(winglet);
-  const enginePod=new THREE.Mesh(new THREE.CylinderGeometry(.34,.38,1.55,18),engine);enginePod.rotation.x=Math.PI/2;enginePod.position.set(side*w*.23,.83,-.15);g.add(enginePod);
-  const intake=new THREE.Mesh(new THREE.CircleGeometry(.29,20),glassCockpit);intake.position.set(side*w*.23,.83,.64);g.add(intake);
+  const engineX=side*w*.23;const enginePod=new THREE.Mesh(new THREE.CylinderGeometry(.34,.38,1.55,24),engine);enginePod.rotation.x=Math.PI/2;enginePod.position.set(engineX,.83,-.15);enginePod.castShadow=true;g.add(enginePod);
+  const intake=new THREE.Mesh(new THREE.CircleGeometry(.29,24),M(0x101c27,.8));intake.position.set(engineX,.83,.635);g.add(intake);
+  const intakeRim=new THREE.Mesh(new THREE.TorusGeometry(.30,.045,8,24),M(0x9eabb5,.28));intakeRim.position.set(engineX,.83,.66);g.add(intakeRim);
+  const fanHub=new THREE.Mesh(new THREE.SphereGeometry(.085,12,10),M(0xb8c4cd,.25));fanHub.position.set(engineX,.83,.69);g.add(fanHub);
+  const fanBladeMat=M(0x8998a4,.38);for(let blade=0;blade<8;blade++){const a=blade*Math.PI/4,fanBlade=new THREE.Mesh(new THREE.BoxGeometry(.035,.31,.025),fanBladeMat);fanBlade.position.set(engineX+Math.cos(a)*.145,.83+Math.sin(a)*.145,.685);fanBlade.rotation.z=a+.28;g.add(fanBlade)}
+  const exhaustRing=new THREE.Mesh(new THREE.TorusGeometry(.31,.035,8,24),M(0x687783,.55));exhaustRing.position.set(engineX,.83,-.94);g.add(exhaustRing);
+  const pylon=new THREE.Mesh(new THREE.BoxGeometry(.25,.34,.85),body);pylon.position.set(engineX,1.04,-.1);g.add(pylon);
   const nav=new THREE.Mesh(new THREE.SphereGeometry(.12,10,8),M(side<0?0xff3434:0x37ee89,.2));nav.position.set(side*w*.49,1.18,-.1);g.add(nav);
   const cabinStripe=new THREE.Mesh(new THREE.BoxGeometry(.035,.105,len*.62),stripe);cabinStripe.position.set(side*(model==='cargo'?.565:.418),1.12,-.02);g.add(cabinStripe);
-  for(let n=0;n<6;n++){const win=new THREE.Mesh(new THREE.SphereGeometry(.065,10,8),glassCockpit);win.scale.set(.34,.78,1.05);win.position.set(side*(model==='cargo'?.565:.418),1.39,len*.22-n*.39);g.add(win)}
+  const windowCount=model==='cargo'?0:Math.max(6,Math.floor(len*1.45));for(let n=0;n<windowCount;n++){const win=new THREE.Mesh(new THREE.SphereGeometry(.065,10,8),glassCockpit);win.scale.set(.34,.78,1.05);win.position.set(side*(model==='cargo'?.565:.418),1.39,len*.22-n*(len*.62/windowCount));g.add(win)}
   const strut=new THREE.Mesh(new THREE.CylinderGeometry(.055,.07,.62,10),dark);strut.position.set(side*1.5,.45,.45);g.add(strut);
   const wheel=new THREE.Mesh(new THREE.CylinderGeometry(.2,.2,.13,14),dark);wheel.rotation.z=Math.PI/2;wheel.position.set(side*1.5,.16,.45);g.add(wheel);landingWheels.push(wheel);
  }
  const cockpit=new THREE.Mesh(new THREE.SphereGeometry(.3,14,10),glassCockpit);cockpit.scale.set(.8,.55,1.5);cockpit.position.set(0,1.53,len*.39);g.add(cockpit);
  const noseGear=new THREE.Mesh(new THREE.CylinderGeometry(.045,.06,.4,8),dark);noseGear.position.set(0,.38,len*.35);g.add(noseGear);
- const noseWheel=new THREE.Mesh(new THREE.CylinderGeometry(.13,.13,.11,12),dark);noseWheel.rotation.z=Math.PI/2;noseWheel.position.set(0,.13,len*.35);g.add(noseWheel);landingWheels.push(noseWheel);
+ const noseWheel=new THREE.Mesh(new THREE.CylinderGeometry(.13,.13,.11,16),dark);noseWheel.rotation.z=Math.PI/2;noseWheel.position.set(0,.13,len*.35);g.add(noseWheel);landingWheels.push(noseWheel);
+ const noseHub=new THREE.Mesh(new THREE.CylinderGeometry(.055,.055,.115,12),M(0x9aa9b5,.35));noseHub.rotation.z=Math.PI/2;noseHub.position.set(.005,.13,len*.35);g.add(noseHub);
+ const noseGearDoor=new THREE.Mesh(new THREE.BoxGeometry(.24,.035,.62),body);noseGearDoor.position.set(0,.42,len*.31);g.add(noseGearDoor);
  g.userData.landingWheels=landingWheels;
  g.position.set(x,0,z);g.scale.setScalar(scale);world.add(g);return g
 }
