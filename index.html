@@ -1228,4 +1228,111 @@ lights.forEach(l=>{if(l.material&&l.material.emissive)l.material.emissiveIntensi
 })();
 </script>
 
+
+<style id="pandora-reference-hud">
+/* Pandora: reference-screen HUD refresh */
+#legacy-hud{display:none}
+body>header, #levelHud, #gameDock, #sideQuickMenu, #musicToggle, #empireLeft, #empireRight, #empireUpgrade{display:none!important}
+#pandoraHUD{position:fixed;inset:0;z-index:55;pointer-events:none;font-family:Inter,system-ui,-apple-system,sans-serif;color:#fff;text-shadow:0 1px 3px #17304a55}
+#pandoraHUD button{pointer-events:auto;border:1px solid #dff4ff66;color:#fff;font-weight:900;font-family:inherit;text-shadow:0 1px 2px #17436a;box-shadow:0 4px 12px #0b294a55,inset 0 1px 0 #ffffff80;cursor:pointer}
+#pandoraTop{position:absolute;top:calc(env(safe-area-inset-top) + 10px);left:12px;right:12px;display:flex;align-items:center;gap:8px;max-width:760px}
+.pandora-resource{height:48px;min-width:0;flex:1;display:flex;align-items:center;gap:9px;padding:5px 12px;border-radius:15px;background:linear-gradient(180deg,#29435b,#152c45);border:2px solid #b5d7ef!important}
+.pandora-resource .ico{font-size:25px;filter:drop-shadow(0 2px 2px #0005)}
+.pandora-resource strong{font-size:clamp(13px,3.5vw,21px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pandora-plus{margin-left:auto;width:31px;height:31px;border-radius:10px;background:linear-gradient(#7bea5c,#20a938);font-size:23px;line-height:1}
+#pandoraBoost{height:48px;padding:0 12px;border-radius:14px;background:linear-gradient(180deg,#f7c54a,#d78a1e);border:2px solid #ffe7a1!important;font-size:16px;white-space:nowrap}
+#pandoraLevel{position:absolute;right:13px;top:calc(env(safe-area-inset-top) + 70px);min-width:112px;text-align:center;padding:8px 14px 9px;border-radius:0 0 18px 18px;background:linear-gradient(180deg,#ffdf80,#d18b24 55%,#9a5b18);border:2px solid #ffe9a4;box-shadow:0 5px 14px #54300b77;font-weight:1000}
+#pandoraLevel small{display:block;font-size:10px;letter-spacing:1px;color:#fff3c7}
+#pandoraLevel strong{display:block;font-size:27px;line-height:1.05;color:white}
+#pandoraLevel em{display:block;font-style:normal;font-size:10px;color:#fff0bd}
+#pandoraIncome{position:absolute;left:12px;top:calc(env(safe-area-inset-top) + 78px);width:174px;padding:10px 12px;border-radius:14px;background:linear-gradient(145deg,#17344fef,#10243ceF);border:1px solid #d8edff55;box-shadow:0 7px 20px #07182c55}
+#pandoraIncome small{display:block;font-weight:800;color:#e8f2fb;font-size:11px}
+#pandoraIncome strong{display:block;color:#8ff276;font-size:clamp(17px,4vw,23px);line-height:1.25}
+#pandoraIncome span{font-size:10px;color:#c9d9e9}
+#pandoraLeft{position:absolute;left:12px;top:42%;transform:translateY(-50%);display:flex;flex-direction:column;gap:9px}
+.pandora-side{width:126px;min-height:58px;text-align:left;padding:7px 10px;border-radius:17px;background:linear-gradient(145deg,#239be7,#07559c);border:2px solid #8bd5ff!important;display:flex;align-items:center;gap:9px;font-size:13px}
+.pandora-side .ico{font-size:27px;filter:drop-shadow(0 2px 2px #17436a)}
+.pandora-side small{display:block;font-size:9px;color:#dff3ff}
+#pandoraOverview{position:absolute;right:12px;top:42%;transform:translateY(-50%);width:174px;padding:11px 12px;border-radius:16px;background:linear-gradient(145deg,#102b47ed,#101f36ed);border:1px solid #c8e7ff55;box-shadow:0 8px 22px #06162b66}
+.pandora-overview-row{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:11px;font-weight:750;border-bottom:1px solid #ffffff19}
+.pandora-overview-row:last-child{border:0}
+.pandora-overview-row b{margin-left:auto;font-size:12px;white-space:nowrap}
+#pandoraBottom{position:absolute;left:10px;right:10px;bottom:calc(env(safe-area-inset-bottom) + 10px);display:grid;grid-template-columns:repeat(6,minmax(0,1fr)) 1.7fr;gap:6px;align-items:stretch}
+.pandora-nav{min-width:0;min-height:66px;border-radius:16px;padding:6px 2px;background:linear-gradient(160deg,#268fdc,#064d94);border:2px solid #86d0ff!important;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:clamp(8px,2.2vw,11px);white-space:nowrap}
+.pandora-nav .ico{font-size:24px;line-height:1.05}
+#pandoraPlay{border-radius:21px;background:linear-gradient(180deg,#a4f33d,#48c900 52%,#239c00);border:3px solid #d6ff9b!important;color:#fff;font-size:clamp(17px,4.5vw,25px);padding:5px 8px;display:flex;align-items:center;justify-content:center;gap:9px;white-space:nowrap}
+#pandoraPlay .playIcon{font-size:32px;text-shadow:0 2px 3px #276900}
+#pandoraHUD button:active{transform:translateY(1px) scale(.97);filter:brightness(1.08)}
+#pandoraHUD .badgeCount{display:inline-grid;place-items:center;min-width:17px;height:17px;border-radius:50%;background:#f04444;color:#fff;font-size:10px;margin-left:2px}
+#pandoraHUD .hud-toast{position:absolute;left:50%;top:calc(env(safe-area-inset-top) + 132px);transform:translateX(-50%);padding:8px 12px;border-radius:12px;background:#112b45eF;border:1px solid #ffffff44;font-size:11px;opacity:0;transition:opacity .2s;white-space:nowrap}
+#pandoraHUD .hud-toast.show{opacity:1}
+@media(max-width:390px){#pandoraTop{left:7px;right:7px;gap:5px}.pandora-resource{height:43px;padding:4px 7px;gap:5px}.pandora-resource .ico{font-size:20px}.pandora-plus{width:26px;height:26px}#pandoraBoost{height:43px;padding:0 7px;font-size:13px}#pandoraIncome{left:8px;width:145px;padding:8px 9px;top:calc(env(safe-area-inset-top) + 72px)}#pandoraLevel{right:8px;top:calc(env(safe-area-inset-top) + 62px);min-width:92px;padding:6px 9px}#pandoraLevel strong{font-size:23px}#pandoraLeft{left:7px;gap:7px}.pandora-side{width:105px;min-height:51px;padding:6px 7px;font-size:11px;gap:6px}.pandora-side .ico{font-size:22px}#pandoraOverview{right:7px;width:145px;padding:8px 9px}.pandora-overview-row{font-size:9px}.pandora-overview-row b{font-size:10px}#pandoraBottom{left:6px;right:6px;gap:4px;bottom:calc(env(safe-area-inset-bottom) + 7px)}.pandora-nav{min-height:57px;border-radius:12px;font-size:8px}.pandora-nav .ico{font-size:20px}#pandoraPlay{border-radius:15px;gap:4px;font-size:16px}#pandoraPlay .playIcon{font-size:25px}}
+@media(min-width:700px){#pandoraTop{left:24px;top:18px}#pandoraIncome{left:24px;top:100px}#pandoraLeft{left:24px}#pandoraOverview{right:24px}#pandoraLevel{right:24px;top:18px}#pandoraBottom{left:20px;right:20px;bottom:14px;max-width:1120px;margin:auto}.pandora-nav{min-height:76px}.pandora-nav .ico{font-size:29px}}
+</style>
+<div id="pandoraHUD" aria-label="Игровой интерфейс Пандоры">
+ <div id="pandoraTop">
+  <div class="pandora-resource"><span class="ico">🪙</span><strong id="phMoney">500</strong><button class="pandora-plus" id="phMoneyPlus" aria-label="Заработать монеты">+</button></div>
+  <div class="pandora-resource"><span class="ico">💎</span><strong id="phPax">24</strong><button class="pandora-plus" id="phPaxPlus" aria-label="Получить пассажиров">+</button></div>
+  <button id="pandoraBoost" type="button">📈 ×1</button>
+ </div>
+ <div id="pandoraIncome"><small>✈ Доход в час:</small><strong id="phIncome">720</strong><span>Аэропорт работает автоматически</span></div>
+ <div id="pandoraLevel"><small>УРОВЕНЬ</small><strong id="phLevel">1</strong><em id="phMax">РАЗВИТИЕ</em></div>
+ <div id="pandoraLeft">
+  <button class="pandora-side" data-open="tasks"><span class="ico">📋</span><span>Задания <small>Цели директора</small></span><i class="badgeCount">3</i></button>
+  <button class="pandora-side" data-open="staff"><span class="ico">👥</span><span>Персонал <small>Команда аэропорта</small></span></button>
+  <button class="pandora-side" data-open="runway"><span class="ico">🛣️</span><span>Взлётные полосы <small>Расширение</small></span></button>
+ </div>
+ <div id="pandoraOverview">
+  <div class="pandora-overview-row"><span>✈</span><span>Самолётов:</span><b id="phPlanes">1 / 13</b></div>
+  <div class="pandora-overview-row"><span>👥</span><span>Пассажиров:</span><b id="phPassengers">24</b></div>
+  <div class="pandora-overview-row"><span>🪙</span><span>Доход:</span><b id="phRate">12/мин</b></div>
+ </div>
+ <div id="pandoraBottom">
+  <button class="pandora-nav" data-nav="0"><span class="ico">✈️</span>Самолёты</button>
+  <button class="pandora-nav" data-nav="1"><span class="ico">🏢</span>Ангары</button>
+  <button class="pandora-nav" data-nav="2"><span class="ico">🛒</span>Магазин</button>
+  <button class="pandora-nav" data-nav="3"><span class="ico">⬆️</span>Улучшения</button>
+  <button class="pandora-nav" data-nav="4"><span class="ico">🏆</span>Достижения</button>
+  <button class="pandora-nav" data-nav="5"><span class="ico">⚙️</span>Настройки</button>
+  <button id="pandoraPlay" type="button"><span class="playIcon">▶</span><span>Играть</span></button>
+ </div>
+ <div class="hud-toast" id="phToast"></div>
+</div>
+<script id="pandora-reference-hud-script">
+(()=> {
+ const $=id=>document.getElementById(id);
+ const fmt=n=>Math.floor(Number(n)||0).toLocaleString('ru-RU');
+ const state=()=>{try{return JSON.parse(localStorage.getItem('airportEmpireSave')||'{}')}catch(e){return {}}};
+ const show=(msg)=>{const el=$('phToast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1700)};
+ const aircraftTotal=s=>Object.values(s.aircraft||{}).reduce((a,b)=>a+(Number(b)||0),0);
+ function refresh(){
+  const s=state(),income=12+(Math.max(0,(s.terminal||1)-1)*7)+(Math.max(0,(s.runway||1)-1)*9)+(Math.max(0,(s.staff||2)-2)*5)+(Math.max(0,(s.service||1)-1)*8)+(Math.max(0,(s.fleet||1)-1)*14)+Object.entries(s.aircraft||{}).reduce((sum,[id,n])=>sum+(Number(n)||0)*({commuter:8,jet:22,cargo:16,turboprop:12,narrow:38,wide:72,jumbo:135,supersonic:260,mega:420,luxury:620,ultra:900,hypersonic:1350,orbital:2100}[id]||0),0);
+  const pax=24+Math.max(0,(s.terminal||1)-1)*18+Math.max(0,(s.staff||2)-2)*7;
+  $('phMoney').textContent=fmt(s.money||500);$('phPax').textContent=fmt(pax);$('phPassengers').textContent=fmt(pax);
+  $('phIncome').textContent=fmt(income*60);$('phRate').textContent=fmt(income)+'/мин';
+  $('phLevel').textContent=fmt(s.level||1);$('phMax').textContent=(s.level||1)>=20?'MAX':'ДО '+Math.min(20,(s.level||1)+1)+' УРОВНЯ';
+  $('pandoraBoost').textContent='📈 ×'+Math.pow(2,Math.min(4,s.extraRunways||0));
+  $('phPlanes').textContent=fmt(aircraftTotal(s))+' / 13';
+ }
+ document.querySelectorAll('#pandoraBottom [data-nav]').forEach(b=>b.addEventListener('click',()=>{
+  const old=document.querySelector('#gameDock button:nth-child('+(Number(b.dataset.nav)+1)+')');
+  if(old)old.click();
+  document.querySelectorAll('#pandoraBottom .pandora-nav').forEach(x=>x.style.filter='brightness(.85)');
+  b.style.filter='brightness(1.18)';
+ }));
+ document.querySelectorAll('#pandoraLeft [data-open]').forEach(b=>b.addEventListener('click',()=>{
+  const idx={tasks:0,staff:1,runway:2}[b.dataset.open];
+  const old=document.querySelector('#sideQuickMenu button:nth-child('+(idx+1)+')');if(old)old.click();
+ }));
+ $('pandoraPlay').addEventListener('click',()=>{
+  const d=$('dispatch');if(d)d.click();
+  show('Рейс обслужен · аэропорт работает!');
+ });
+ $('phMoneyPlus').addEventListener('click',()=>{const d=$('daily');if(d&&!d.disabled){d.click();show('Получен ежедневный бонус!')}else show('Монеты зарабатываются за рейсы и время')});
+ $('phPaxPlus').addEventListener('click',()=>{const b=document.querySelector('#pandoraBottom [data-nav="0"]');if(b)b.click();show('Открой авиапарк и расширяй пассажиропоток')});
+ const obs=new MutationObserver(refresh);['money','income','pax','levelHudValue'].forEach(id=>{const el=$(id);if(el)obs.observe(el,{childList:true,characterData:true,subtree:true})});
+ setInterval(refresh,1000);refresh();
+})();
+</script>
+
 </body></html>
