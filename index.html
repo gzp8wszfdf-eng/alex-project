@@ -212,13 +212,13 @@ for(let z=-49;z<-24;z+=4)slab(43,z,.28,.45,yellow,.2);
 slab(0,-9,82,12,concrete);slab(0,-9,78,8,road,.12);
 for(let x=-36;x<38;x+=5)slab(x,-9,.22,.42,white,.2);
 for(let z=-17;z<1;z+=4)slab(-37,z,.7,.7,yellow,.22);
-slab(-2,9,54,31,concrete);
+slab(-2,12,80,42,concrete);
 for(let x=-28;x<25;x+=5)slab(x,-1,.18,9,white,.22);
 // Четыре компактных места встроены в исходный перрон у терминала.
-for(const x of [-21,-7,7,21]){
- slab(x,17,9,.16,yellow,.2);
- slab(x-4.5,18,.16,3.2,yellow,.2);
- slab(x+4.5,18,.16,3.2,yellow,.2);
+for(const x of [-30,-18,-6,6,18,30]){
+ slab(x,22,11,.16,yellow,.2);
+ slab(x-5.5,23,.16,3.2,yellow,.2);
+ slab(x+5.5,23,.16,3.2,yellow,.2);
 }
 // Огни кромки ВПП и рулёжных дорожек с мягким свечением.
 const runwayGlow=M(0xd8f3ff,.25);runwayGlow.emissive=new THREE.Color(0x9bcfff);runwayGlow.emissiveIntensity=.48;
@@ -428,7 +428,7 @@ for(let y=.8;y<12.5;y+=.65){
 }
 
 // Hangars and service buildings unlock with service upgrades
-box(29,0,13,14,4,12,wall);box(29,4,13,14,.7,12,yellow);
+box(43,0,13,14,4,12,wall);box(43,4,13,14,.7,12,yellow);
 for(let i=0;i<Math.min(6,lv.service-1);i++){const x=30+(i%3)*11,z=29+Math.floor(i/3)*12;box(x,0,z,8,4,8,wall);box(x,4,z,8,.5,8,roof);box(x,1,z-4.08,4,2.2,.12,blue)}
 // Световые полосы и номера стоянок у терминала
 for(let i=0;i<7;i++){
@@ -465,7 +465,7 @@ for(let i=0;i<Math.min(7,3+lv.terminal);i++){
  const gateLight=new THREE.Mesh(new THREE.SphereGeometry(.17,8,6),M(0x6ce8ff,.25));gateLight.position.set(x,3,-.9);world.add(gateLight);lights.push(gateLight);
 }
 // Parking lot and cars
-slab(-20,31,38,16,road);for(let x=-36;x<-2;x+=4){slab(x,25,.15,9,white,.13)}
+slab(-20,39,38,12,road);for(let x=-36;x<-2;x+=4){slab(x,35,.15,9,white,.13)}
 // Наземная техника: багажные тягачи, автобусы и топливозаправщик
 const serviceVehicles=[];
 function serviceVan(x,z,color=0xf2bb45,type='cart'){
@@ -784,8 +784,8 @@ const fleetModels=[
  ['luxury',0xc9d8e8,.40],['ultra',0xf0f4ff,.40],['hypersonic',0xb8d7ef,.40],
  ['orbital',0xc7d5e8,.40]
 ];
-// На исходном перроне помещаются четыре детализированных самолёта; остальные остаются во флоте.
-const fleetSlots=[[-21,17],[-7,17],[7,17],[21,17]];
+// Шесть самолётов помещаются на одном расширенном перроне; остальные остаются во флоте.
+const fleetSlots=[[-30,22],[-18,22],[-6,22],[6,22],[18,22],[30,22]];
 function rebuildFleetDisplay(){
  fleetDisplay.children.slice().forEach(g=>g.traverse(o=>{if(o.geometry)o.geometry.dispose();if(Array.isArray(o.material))o.material.forEach(m=>m.dispose());else if(o.material)o.material.dispose()}));
  fleetDisplay.clear();
@@ -886,10 +886,10 @@ for(const x of [-14,-8,-2,4]){
  detailBox(x,6.8,12.15,.82,.08,.65,steelDetail,terminal);
 }
 // Реалистичные ворота ангара, предупреждающая разметка и боковые прожекторы.
-detailBox(29,.18,6.82,9.2,3.65,.16,hangarDoorMat);
-for(let x=24.8;x<=33.2;x+=1.4)detailBox(x,.25,6.72,.075,3.25,.08,brightMetal);
-detailBox(29,.22,6.58,9.6,.22,.2,safetyMat);
-for(const x of [22,36]){
+detailBox(43,.18,6.82,9.2,3.65,.16,hangarDoorMat);
+for(let x=38.8;x<=47.2;x+=1.4)detailBox(x,.25,6.72,.075,3.25,.08,brightMetal);
+detailBox(43,.22,6.58,9.6,.22,.2,safetyMat);
+for(const x of [36,50]){
  detailBox(x,3.1,6.45,.22,.28,.18,signGold);
  const lamp=new THREE.Mesh(new THREE.SphereGeometry(.16,10,8),M(0xffedb5,.2));
  lamp.position.set(x,4.1,6.35);ultimateDetails.add(lamp);lights.push(lamp);
