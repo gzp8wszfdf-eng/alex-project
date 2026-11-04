@@ -688,7 +688,7 @@ for(let i=0;i<4;i++){
 const curbSlots=[-15,-10,-5,0];
 // Пассажиры рейса: отдельная группа идёт от терминала к выходу A1.
 const boardingPeople=[];
-for(let i=0;i<7;i++){
+for(let i=0;i<9;i++){
  const p=new THREE.Group();
  const shirt=new THREE.Mesh(new THREE.CylinderGeometry(.15,.2,.62,8),M([0x315b91,0xe8e1d0,0x4c9b83,0xb77a45][i%4]));
  const head=new THREE.Mesh(new THREE.SphereGeometry(.16,10,8),M(0xe5b995));
@@ -700,7 +700,7 @@ for(let i=0;i<7;i++){
 }
 // Прибывшие пассажиры выходят из самолёта и направляются в терминал.
 const arrivingPeople=[];
-for(let i=0;i<6;i++){
+for(let i=0;i<8;i++){
  const p=new THREE.Group();
  const torso=new THREE.Mesh(new THREE.CylinderGeometry(.15,.2,.62,8),M([0x426b9a,0xe8e1d0,0x7a9b70,0xb77a45,0x735b91,0x4c9b83][i]));
  const head=new THREE.Mesh(new THREE.SphereGeometry(.16,10,8),M(0xe5b995));
@@ -711,7 +711,7 @@ for(let i=0;i<6;i++){
  suitcase.position.set(.28,.42,.04);p.add(suitcase);
  p.userData={offset:i*.85,legA,legB};p.visible=false;world.add(p);arrivingPeople.push(p);
 }
-const people=[];for(let i=0;i<8;i++){const p=new THREE.Group(),body=new THREE.Mesh(new THREE.CylinderGeometry(.18,.23,.72,8),M(i%3===0?0x315b91:i%3===1?0xe8e1d0:0x4c9b83)),head=new THREE.Mesh(new THREE.SphereGeometry(.19,10,8),M(0xe5b995));body.position.y=.78;head.position.y=1.28;p.add(body,head);const leg1=new THREE.Mesh(new THREE.BoxGeometry(.12,.48,.14),dark),leg2=leg1.clone();leg1.position.set(-.1,.24,0);leg2.position.set(.1,.24,0);p.add(leg1,leg2);p.userData={phase:i*.72,leg1,leg2};p.position.set(-30,0,18);world.add(p);people.push(p)}
+const people=[];for(let i=0;i<12;i++){const p=new THREE.Group(),body=new THREE.Mesh(new THREE.CylinderGeometry(.18,.23,.72,8),M(i%3===0?0x315b91:i%3===1?0xe8e1d0:0x4c9b83)),head=new THREE.Mesh(new THREE.SphereGeometry(.19,10,8),M(0xe5b995));body.position.y=.78;head.position.y=1.28;p.add(body,head);const leg1=new THREE.Mesh(new THREE.BoxGeometry(.12,.48,.14),dark),leg2=leg1.clone();leg1.position.set(-.1,.24,0);leg2.position.set(.1,.24,0);p.add(leg1,leg2);p.userData={phase:i*.72,leg1,leg2};p.position.set(-30,0,18);world.add(p);people.push(p)}
 // Периметр аэропорта и дальняя городская застройка на горизонте.
 for(let x=-65;x<=65;x+=5){
  const h=3.5+(Math.sin(x*1.7)+1)*2.2;
@@ -845,7 +845,134 @@ const arrivalStairs=passengerStairs.clone(true);
 arrivalStairs.position.set(16,0,-7.2);
 arrivalStairs.visible=false;
 world.add(arrivalStairs);
-const clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();const smooth=u=>{u=Math.max(0,Math.min(1,u));return u*u*(3-2*u)};const mix=(a,b,u)=>a+(b-a)*smooth(u);// Прилёт: заход, касание полосы, пробег и руление к стоянке.
+
+// ULTIMATE AIRPORT LAYER — дополнительные детали единого аэропорта.
+const ultimateDetails=new THREE.Group();world.add(ultimateDetails);
+const detailBox=(x,y,z,w,h,d,mat,parent=ultimateDetails)=>{
+ const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);
+ o.position.set(x,y+h/2,z);parent.add(o);return o;
+};
+const steelDetail=M(0x536875,.55),brightMetal=M(0xc5d0d5,.34),signBlue=M(0x12334c,.35),
+      signGold=M(0xffc85a,.35),solarMat=M(0x183b58,.28),fenceMat=M(0x71818a,.75),
+      hangarDoorMat=M(0x71838b,.72),safetyMat=M(0xf0bd43,.55);
+// Главный вход: стеклянные автоматические двери и широкий козырёк.
+detailBox(-5,.12,-3.95,12,.18,3.2,steelDetail);
+detailBox(-5,3.85,-3.95,13,.22,3.4,blue);
+for(const x of [-11,-5,1]){
+ detailBox(x,0,-3.2,.12,3.3,.12,brightMetal);
+ detailBox(x-.92,.25,-.12,1.78,2.55,.07,terminalGlass);
+ detailBox(x+.92,.25,-.12,1.78,2.55,.07,terminalGlass);
+ detailBox(x,1.85,-.06,.08,2.8,.12,brightMetal);
+}
+for(const x of [-10,-5,0])detailBox(x,.1,-5.55,.18,3.75,.18,steelDetail);
+// Табличка аэропорта над входом.
+{
+ const c=document.createElement('canvas');c.width=768;c.height=180;
+ const q=c.getContext('2d');q.fillStyle='#102f49';q.fillRect(0,0,768,180);
+ q.strokeStyle='#f2c66c';q.lineWidth=8;q.strokeRect(8,8,752,164);
+ q.fillStyle='#f4f8fb';q.font='900 62px system-ui';q.textAlign='center';
+ q.fillText('INTERNATIONAL AIRPORT',384,78);
+ q.fillStyle='#ffd477';q.font='700 35px system-ui';q.fillText('MINERALNYE VODY',384,132);
+ const tex=new THREE.CanvasTexture(c);
+ const sign=new THREE.Mesh(new THREE.PlaneGeometry(12,2.8),new THREE.MeshBasicMaterial({map:tex,side:THREE.DoubleSide}));
+ sign.position.set(-5,5.1,-.28);ultimateDetails.add(sign);
+}
+// Панели на крыше и вентиляционные блоки терминала.
+for(const x of [-14,-8,-2,4]){
+ const panel=detailBox(x,6.22,4.2,3.2,.12,2.1,solarMat,terminal);
+ panel.rotation.x=-.08;
+ for(let k=0;k<3;k++)detailBox(x-1.05+k*1.05,6.29,4.2,.035,.025,1.95,brightMetal,terminal);
+ const hvac=detailBox(x,6.2,12.15,1.15,.58,.95,terminalRoof,terminal);
+ detailBox(x,6.8,12.15,.82,.08,.65,steelDetail,terminal);
+}
+// Реалистичные ворота ангара, предупреждающая разметка и боковые прожекторы.
+detailBox(29,.18,6.82,9.2,3.65,.16,hangarDoorMat);
+for(let x=24.8;x<=33.2;x+=1.4)detailBox(x,.25,6.72,.075,3.25,.08,brightMetal);
+detailBox(29,.22,6.58,9.6,.22,.2,safetyMat);
+for(const x of [22,36]){
+ detailBox(x,3.1,6.45,.22,.28,.18,signGold);
+ const lamp=new THREE.Mesh(new THREE.SphereGeometry(.16,10,8),M(0xffedb5,.2));
+ lamp.position.set(x,4.1,6.35);ultimateDetails.add(lamp);lights.push(lamp);
+}
+// Маркировка стоянок и световые табло выходов A1–A4.
+for(let i=0;i<4;i++){
+ const x=[-22,-7,8,22][i];
+ const c=document.createElement('canvas');c.width=256;c.height=192;
+ const q=c.getContext('2d');q.fillStyle='#123b55';q.fillRect(0,0,256,192);
+ q.strokeStyle='#f7d47c';q.lineWidth=10;q.strokeRect(5,5,246,182);
+ q.fillStyle='#fff';q.font='900 112px system-ui';q.textAlign='center';q.fillText('A'+(i+1),128,135);
+ const tex=new THREE.CanvasTexture(c);
+ const board=new THREE.Mesh(new THREE.PlaneGeometry(1.65,1.25),new THREE.MeshBasicMaterial({map:tex,side:THREE.DoubleSide}));
+ board.position.set(x,2.8,-4.85);ultimateDetails.add(board);
+ detailBox(x,0,-4.85,.12,2.2,.12,steelDetail);
+ // Наземный блок питания и небольшой сигнальный конус у каждого выхода.
+ detailBox(x+2.5,.12,-10.7,.72,.65,.62,M(0x287c91,.5));
+ const cone=new THREE.Mesh(new THREE.ConeGeometry(.22,.62,10),safetyMat);
+ cone.position.set(x-2.7,.43,-10.6);ultimateDetails.add(cone);
+}
+// Пешеходный переход между парковкой и терминалом.
+for(let i=0;i<12;i++)detailBox(-21+i*1.55,.125,22.5,.78,.025,2.8,white);
+// Разметка парковочных мест перед терминалом.
+for(let x=-37;x<=-3;x+=4.2){
+ detailBox(x,.125,25.5,.11,.025,4.5,white);
+ detailBox(x,.125,37,.11,.025,4.5,white);
+}
+for(const z of [25.5,37])detailBox(-20,.125,z,34,.025,.11,white);
+// Мачты освещения перрона с двойными LED-прожекторами.
+const apronMasts=[];
+for(const [x,z] of [[-34,3],[34,3],[-34,21],[34,21]]){
+ detailBox(x,0,z,.34,12,.34,steelDetail);
+ detailBox(x,11.8,z,3.4,.18,.42,steelDetail);
+ for(const side of [-1,1]){
+  const lamp=new THREE.Mesh(new THREE.BoxGeometry(.85,.22,.55),M(0xffe8b5,.22));
+  lamp.position.set(x+side*1.05,11.65,z);ultimateDetails.add(lamp);
+  const glow=new THREE.Mesh(new THREE.SphereGeometry(.2,8,6),M(0xffe9bd,.2));
+  glow.material.emissive=new THREE.Color(0xffd58a);glow.material.emissiveIntensity=.8;
+  glow.position.set(x+side*1.05,11.45,z);ultimateDetails.add(glow);lights.push(glow);
+ }
+ apronMasts.push({x,z});
+}
+// Низкий периметральный забор с въездным проёмом — один аэропорт, единая территория.
+for(const side of [-1,1]){
+ for(let z=-62;z<=44;z+=5.5){
+  detailBox(side*51,0,z,.16,1.55,.16,fenceMat);
+ }
+ detailBox(side*51,.92,-9,.12,.12,92,fenceMat);
+ detailBox(side*51,.48,-9,.12,.12,92,fenceMat);
+}
+for(let x=-51;x<=51;x+=5.5){
+ if(x>-8&&x<8)continue;
+ detailBox(x,0,46,.16,1.55,.16,fenceMat);
+}
+detailBox(-30,.92,46,42,.12,.12,fenceMat);
+detailBox(30,.92,46,42,.12,.12,fenceMat);
+detailBox(-30,.48,46,42,.12,.12,fenceMat);
+detailBox(30,.48,46,42,.12,.12,fenceMat);
+// Световые стойки и указатели руления.
+for(const [x,z,txt] of [[-46,-23,'B'],[46,-23,'C'],[-46,-8,'A'],[46,-8,'D']]){
+ detailBox(x,0,z,.16,2.4,.16,steelDetail);
+ const c=document.createElement('canvas');c.width=256;c.height=128;
+ const q=c.getContext('2d');q.fillStyle='#123b36';q.fillRect(0,0,256,128);
+ q.strokeStyle='#e9d27d';q.lineWidth=8;q.strokeRect(4,4,248,120);
+ q.fillStyle='#fff';q.font='900 82px system-ui';q.textAlign='center';q.fillText(txt,128,94);
+ const tex=new THREE.CanvasTexture(c);
+ const board=new THREE.Mesh(new THREE.PlaneGeometry(1.9,.95),new THREE.MeshBasicMaterial({map:tex,side:THREE.DoubleSide}));
+ board.position.set(x,2.05,z);ultimateDetails.add(board);
+}
+// Ветроуказатель у полосы.
+const windsock=new THREE.Group();world.add(windsock);
+const sockPole=new THREE.Mesh(new THREE.CylinderGeometry(.09,.13,6.5,10),steelDetail);
+sockPole.position.y=3.25;windsock.add(sockPole);
+const sockPivot=new THREE.Group();sockPivot.position.set(0,6.25,0);windsock.add(sockPivot);
+const sock=new THREE.Mesh(new THREE.CylinderGeometry(.08,.38,2.7,12,1,true),M(0xf0f3ed,.72));
+sock.rotation.z=-Math.PI/2;sock.position.x=1.35;sockPivot.add(sock);
+for(let i=0;i<4;i++){
+ const band=new THREE.Mesh(new THREE.TorusGeometry(.1+i*.075,.035,6,14),i%2?M(0xd84a42):M(0xf5f2e8));
+ band.rotation.y=Math.PI/2;band.position.x=.25+i*.58;sockPivot.add(band);
+}
+windsock.position.set(-47,0,-38);
+// Увеличенная толпа: больше пассажиров в зале и на маршрутах посадки.
+const clock=new THREE.Clock();function animate(){requestAnimationFrame(animate);const t=clock.getElapsedTime();sockPivot.rotation.y=.18*Math.sin(t*.22);dish.rotation.y=t*.32;const smooth=u=>{u=Math.max(0,Math.min(1,u));return u*u*(3-2*u)};const mix=(a,b,u)=>a+(b-a)*smooth(u);// Прилёт: заход, касание полосы, пробег и руление к стоянке.
 const arrivalCycle=t%72,arrival=planes[0];
 arrival.rotation.z=0;arrival.rotation.y=-Math.PI/2;
 if(arrivalCycle<18){
