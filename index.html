@@ -205,7 +205,14 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
 const host=document.getElementById('threeWorld');
 const save=(()=>{try{return JSON.parse(localStorage.getItem('airportEmpireSave')||'{}')}catch{return {}}})();
 const lv={terminal:Math.max(1,save.terminal||1),runway:Math.max(1,save.runway||1),staff:Math.max(1,save.staff||1),service:Math.max(1,save.service||1),fleet:Math.max(1,save.fleet||1),aircraft:{commuter:save.aircraft?.commuter||1,jet:save.aircraft?.jet||0,cargo:save.aircraft?.cargo||0,turboprop:save.aircraft?.turboprop||0,narrow:save.aircraft?.narrow||0,wide:save.aircraft?.wide||0,jumbo:save.aircraft?.jumbo||0,supersonic:save.aircraft?.supersonic||0,mega:save.aircraft?.mega||0,luxury:save.aircraft?.luxury||0,ultra:save.aircraft?.ultra||0,hypersonic:save.aircraft?.hypersonic||0,orbital:save.aircraft?.orbital||0}};
-const scene=new THREE.Scene();scene.background=new THREE.Color(0x9bc8d8);scene.fog=new THREE.Fog(0x9bc8d8,115,240);
+const scene=new THREE.Scene();
+// Более выразительное небо: плавный голубой градиент вместо однотонного фона.
+const skyCanvas=document.createElement('canvas');skyCanvas.width=2;skyCanvas.height=512;
+const skyCtx=skyCanvas.getContext('2d');const skyGrad=skyCtx.createLinearGradient(0,0,0,512);
+skyGrad.addColorStop(0,'#4c8fb8');skyGrad.addColorStop(.42,'#91c5d8');skyGrad.addColorStop(.78,'#d8e9e6');skyGrad.addColorStop(1,'#e9e6d5');
+skyCtx.fillStyle=skyGrad;skyCtx.fillRect(0,0,2,512);
+const skyTexture=new THREE.CanvasTexture(skyCanvas);skyTexture.colorSpace=THREE.SRGBColorSpace;
+scene.background=skyTexture;scene.fog=new THREE.Fog(0xc5dfe0,125,260);
 const camera=new THREE.PerspectiveCamera(42,1,.1,260);
 const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance',precision:'highp'});const gpuMaxTexture=renderer.capabilities.maxTextureSize;renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.85));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;host.appendChild(renderer.domElement);
 window.addEventListener('error',()=>document.body.classList.remove('webgl-ready'));
@@ -223,6 +230,32 @@ road.bumpMap=surfaceRelief(401);road.bumpMap.repeat.set(5,3);road.bumpScale=.018
 concrete.bumpMap=surfaceRelief(907);concrete.bumpMap.repeat.set(4,3);concrete.bumpScale=.026;
 grass.needsUpdate=road.needsUpdate=concrete.needsUpdate=true;
 const world=new THREE.Group();scene.add(world);
+// Дальний городской горизонт: невысокие здания и зелёные холмы за территорией аэропорта.
+const horizon=new THREE.Group();scene.add(horizon);
+const cityMats=[M(0x78939b,.95),M(0x9aa9a7,.95),M(0x687f8c,.95),M(0xb3b7aa,.95)];
+const cityWindow=M(0x9bc8d2,.5);
+for(let side of [-1,1]){
+ for(let i=0;i<13;i++){
+  const x=side*(88+i*7.2),z=-112-(i%4)*10;
+  const w=5+(i%3)*2.2,h=7+(i%5)*3.4,d=6+(i%4)*2;
+  const building=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),cityMats[i%cityMats.length]);
+  building.position.set(x,h/2,z);building.castShadow=true;horizon.add(building);
+  for(let yy=2.2;yy<h-1;yy+=2.3)for(let xx=-w/2+1;xx<w/2-.5;xx+=1.7){
+   const win=new THREE.Mesh(new THREE.BoxGeometry(.72,.82,.06),cityWindow);
+   win.position.set(x+xx,yy,z+d/2+.04);horizon.add(win);
+  }
+ }
+}
+// Мягкие облака из нескольких объёмных форм на горизонте.
+const cloudMat=new THREE.MeshStandardMaterial({color:0xf4f8f5,roughness:1,transparent:true,opacity:.78});
+for(const [x,y,z,scale] of [[-62,34,-92,1],[12,42,-118,1.25],[72,32,-104,.9],[-95,29,-65,.8],[105,39,-80,1.1]]){
+ const cloud=new THREE.Group();
+ for(const [dx,dy,dz,r] of [[0,0,0,4],[3,1,0,3.3],[-3,.7,.4,3.1],[1.5,-.5,1.8,2.8]]){
+  const puff=new THREE.Mesh(new THREE.SphereGeometry(r,12,9),cloudMat);
+  puff.position.set(dx,dy,dz);cloud.add(puff);
+ }
+ cloud.position.set(x,y,z);cloud.scale.setScalar(scale);horizon.add(cloud);
+}
 const purchasedRunways=new THREE.Group();world.add(purchasedRunways);
 function rebuildPurchasedRunways(){while(purchasedRunways.children.length){const o=purchasedRunways.children.pop();o.geometry?.dispose()}const count=Math.min(4,s.extraRunways||0);for(let i=0;i<count;i++){const z=-78-i*25;const base=new THREE.Mesh(new THREE.BoxGeometry(92,.12,16),road);base.position.set(0,.04,z);base.receiveShadow=true;purchasedRunways.add(base);for(let x=-43;x<45;x+=6){const mark=new THREE.Mesh(new THREE.BoxGeometry(.28,.035,.45),white);mark.position.set(x,.13,z);purchasedRunways.add(mark)}for(const side of [-1,1])for(let x=-44;x<=44;x+=4){const lamp=new THREE.Mesh(new THREE.SphereGeometry(.11,8,6),runwayGlow);lamp.position.set(x,.2,z+side*8.5);purchasedRunways.add(lamp)}const threshold=new THREE.Mesh(new THREE.BoxGeometry(1,.04,5),white);threshold.position.set(-39,.15,z);purchasedRunways.add(threshold)}}
 const label=(txt,x,y,z)=>{const c=document.createElement('canvas');c.width=512;c.height=128;const q=c.getContext('2d');q.fillStyle='#12324a';q.font='bold 58px system-ui';q.textAlign='center';q.fillText(txt,256,82);const tex=new THREE.CanvasTexture(c);const m=new THREE.MeshBasicMaterial({map:tex,transparent:true});const o=new THREE.Mesh(new THREE.PlaneGeometry(12,3),m);o.rotation.x=-Math.PI/2;o.position.set(x,y,z);world.add(o)};
