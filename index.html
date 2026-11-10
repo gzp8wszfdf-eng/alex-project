@@ -1173,7 +1173,7 @@ boardingPeople.forEach((p,i)=>{
   q.legA.rotation.x=Math.sin(t*5.2+i)*.24;q.legB.rotation.x=-Math.sin(t*5.2+i)*.24;
  }
 });
-const daylight=(Math.sin(t*.035-1.2)+1)/2;const night=1-daylight;sun.intensity=.35+1.95*daylight;scene.background.setRGB(.035+.57*daylight,.075+.68*daylight,.15+.70*daylight);scene.fog.color.copy(scene.background);const weather=document.getElementById('weather');if(weather)weather.textContent=daylight>.62?'☀ ДЕНЬ · 22°':daylight<.28?'🌙 НОЧЬ · 14°':'🌆 ВЕЧЕР · 18°';lights.forEach(l=>{l.material.emissiveIntensity=.12+night*.9});cars.forEach((c,i)=>{
+const daylight=(Math.sin(t*.035-1.2)+1)/2;const night=1-daylight;sun.intensity=.35+1.95*daylight;scene.background=new THREE.Color(.035+.57*daylight,.075+.68*daylight,.15+.70*daylight);scene.fog.color.copy(scene.background);const weather=document.getElementById('weather');if(weather)weather.textContent=daylight>.62?'☀ ДЕНЬ · 22°':daylight<.28?'🌙 НОЧЬ · 14°':'🌆 ВЕЧЕР · 18°';lights.forEach(l=>{l.material.emissiveIntensity=.12+night*.9});cars.forEach((c,i)=>{
  const cycle=((t-i*4.2)%16.8+16.8)%16.8,slot=curbSlots[i],p=curbPassengers[i];
  const smooth=u=>{u=Math.max(0,Math.min(1,u));return u*u*(3-2*u)};
  if(cycle<4){const u=smooth(cycle/4);c.visible=true;c.position.set(-38+(slot+38)*u,.018,19);c.rotation.y=Math.PI/2;}
