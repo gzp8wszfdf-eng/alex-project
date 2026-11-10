@@ -201,7 +201,14 @@ ctx.fillStyle='#173047';ctx.font='bold 13px system-ui';ctx.fillText('RUNWAY 01',
 requestAnimationFrame(draw)}draw();
 </script>
 <script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+// Загружаем Three.js с резервного CDN: это помогает, если jsDelivr недоступен в мобильном браузере.
+const THREE=await (async()=>{
+ try{return await import('https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js')}
+ catch(primaryError){
+  console.warn('Основной CDN Three.js недоступен, пробуем резервный',primaryError);
+  return await import('https://unpkg.com/three@0.160.0/build/three.module.js');
+ }
+})();
 const host=document.getElementById('threeWorld');
 const save=(()=>{try{return JSON.parse(localStorage.getItem('airportEmpireSave')||'{}')}catch{return {}}})();
 const lv={terminal:Math.max(1,save.terminal||1),runway:Math.max(1,save.runway||1),staff:Math.max(1,save.staff||1),service:Math.max(1,save.service||1),fleet:Math.max(1,save.fleet||1),aircraft:{commuter:save.aircraft?.commuter||1,jet:save.aircraft?.jet||0,cargo:save.aircraft?.cargo||0,turboprop:save.aircraft?.turboprop||0,narrow:save.aircraft?.narrow||0,wide:save.aircraft?.wide||0,jumbo:save.aircraft?.jumbo||0,supersonic:save.aircraft?.supersonic||0,mega:save.aircraft?.mega||0,luxury:save.aircraft?.luxury||0,ultra:save.aircraft?.ultra||0,hypersonic:save.aircraft?.hypersonic||0,orbital:save.aircraft?.orbital||0}};
