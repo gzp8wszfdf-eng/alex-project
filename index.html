@@ -215,8 +215,14 @@ const skyTexture=new THREE.CanvasTexture(skyCanvas);skyTexture.colorSpace=THREE.
 scene.background=skyTexture;scene.fog=new THREE.Fog(0xc5dfe0,125,260);
 const camera=new THREE.PerspectiveCamera(42,1,.1,260);
 const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance',precision:'highp'});const gpuMaxTexture=renderer.capabilities.maxTextureSize;renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.85));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;host.appendChild(renderer.domElement);
-window.addEventListener('error',()=>document.body.classList.remove('webgl-ready'));
-window.addEventListener('unhandledrejection',()=>document.body.classList.remove('webgl-ready'));
+renderer.domElement.addEventListener('webglcontextlost',e=>{
+ e.preventDefault();
+ document.body.classList.remove('webgl-ready');
+ console.warn('WebGL context lost — showing safe 2D fallback');
+});
+// Не переключаемся на 2D из-за посторонних ошибок интерфейса: WebGL уже может успешно работать.
+window.addEventListener('error',e=>console.warn('Airport UI error (3D scene kept active):',e.message));
+window.addEventListener('unhandledrejection',e=>console.warn('Airport async UI error (3D scene kept active):',e.reason));
 scene.add(new THREE.HemisphereLight(0xe8f6ff,0x58764e,2));
 const sun=new THREE.DirectionalLight(0xfff0d5,2.5);sun.position.set(-25,48,25);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-72;sun.shadow.camera.right=72;sun.shadow.camera.top=72;sun.shadow.camera.bottom=-72;sun.shadow.camera.near=1;sun.shadow.camera.far=150;sun.shadow.bias=-0.00018;sun.shadow.normalBias=.025;sun.shadow.radius=4;scene.add(sun);const fillLight=new THREE.DirectionalLight(0xb9dcff,.48);fillLight.position.set(35,22,-35);scene.add(fillLight);
 const M=(c,r=.8)=>new THREE.MeshStandardMaterial({color:c,roughness:r});
